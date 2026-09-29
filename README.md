@@ -48,7 +48,7 @@ reversible.
 
 ```sh
 ./tools/check-stubs.sh
-node ../true-friends-website/tools/check-links.js .
+node tools/check-links.js .
 ```
 
 The link checker cannot see paths built in JavaScript. That is how the 1996
