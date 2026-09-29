@@ -1,0 +1,939 @@
+/* True Friends — Page layout & sections (mobile-first, responsive) */
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem var(--container-padding);
+  overflow: hidden;
+  text-align: left;
+  --hero-photo-url: url("../img/studio-hero-bg.webp");
+}
+
+.hero--consulting {
+  --hero-photo-url: url("../img/consulting-hero-bg.webp");
+}
+
+/* Reference case modifiers — set the per-case hero photo here so the URL
+   stays out of inline `style` attributes (blocked by the page CSP). */
+.hero--epiroc {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/epiroc/epiroc-hero.webp");
+}
+
+.hero--kopparbergs-brewery {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/kopparbergs-brewery/kopparbergs-hero.webp");
+}
+
+.hero--ske-kraft {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/ske-kraft/ske-kraft-hero.webp");
+}
+
+.hero--avarn {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/avarn/avarn-bg.webp");
+}
+
+.hero--bufab {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/bufab/bufab-bg.webp");
+}
+
+.hero--sectra {
+  --hero-photo-url: url("../img/reference-cases/johnny-vigersten/sectra/sectra-bg.webp");
+}
+
+@media (min-width: 768px) {
+  .hero {
+    min-height: 92vh;
+  }
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--gradient-hero);
+  background-size: cover;
+  background-position: center;
+}
+
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--hero-photo-url, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.85;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+}
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 55% 60% at 50% 55%, rgba(10, 10, 10, 0.7) 0%, rgba(10, 10, 10, 0) 70%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.4) 0%, rgba(10, 10, 10, 0.1) 35%, rgba(10, 10, 10, 0.6) 100%);
+}
+
+.hero__content {
+  display: grid;
+  gap: 0;
+  justify-items: start;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.hero__cta {
+  margin-top: 32px;
+  justify-self: center;
+}
+
+.hero__cta--row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+/* Hero modifiers */
+.hero--center .hero__content {
+  justify-items: center;
+  text-align: center;
+  max-width: 720px;
+  gap: 32px;
+}
+
+.hero--center .hero__cta { margin-top: 0; }
+
+.hero--studio .hero__scrim,
+.hero--blog .hero__scrim,
+body.landing .hero__scrim {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 48%, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0) 75%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.45) 0%, rgba(10, 10, 10, 0.2) 35%, rgba(10, 10, 10, 0.6) 100%);
+}
+
+.hero--studio .hero__content,
+body.landing .hero__content {
+  gap: clamp(20px, 2.2vw, 32px);
+}
+
+/* Reference case hero — mirrors the brand-hero size + rhythm used on
+   consulting / studio so the header reads as the same section, minus the
+   chrome-box header. Same content-driven height, same padding stack, same
+   left/right zero padding as `.hero--brand`. */
+.hero--blog {
+  min-height: auto;
+  padding: clamp(8rem, 14vw, 12rem) 0 clamp(6rem, 12vw, 10rem);
+  align-items: stretch;
+}
+
+/* Studio + consulting hero photos: full opacity and no bottom fade. The
+   `.hero--studio` modifier is present on both pages (consulting also carries
+   `.hero--consulting`), so one selector covers them both. Landing has
+   neither modifier, so its `.hero__photo` keeps the base fade and opacity. */
+.hero--studio .hero__photo {
+  opacity: 1;
+  -webkit-mask-image: none;
+          mask-image: none;
+}
+
+/* Reference case hero photo: mirrors `.hero--brand .hero__photo` so the
+   photo covers the hero, extends behind the fixed nav, and fades out with
+   the same 60% linear mask used on consulting / landing. */
+.hero--blog .hero__photo {
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+}
+
+/* Client logo replaces the headline on reference case heros. Sized a step
+   above the old title font-size so the client mark carries the hero. */
+.hero__case-heading {
+  margin: 0;
+  line-height: 0;
+}
+
+.hero__case-logo {
+  display: block;
+  width: auto;
+  height: clamp(44px, 8vw, 88px);
+  object-fit: contain;
+}
+
+body.landing .hero__content {
+  max-width: 800px;
+}
+
+/* ---------- Landing page layout ---------- */
+/* Sticky footer: body fills at least the viewport, main flex-grows so the
+   footer always sits at the bottom of the screen (or bottom of the page
+   if content pushes past it). The hero itself also flex-grows inside main
+   so the hero photo (position: absolute inset: 0 inside the hero) fills
+   the whole area between the nav and the email/footer row. Content is
+   vertically centred inside the hero via align-items: center. */
+body.landing {
+  display: flex;
+  flex-direction: column;
+  /* svh is the *small* viewport height — the visible area with mobile
+     browser chrome showing. 100vh is the large one, which overshoots on
+     phones and puts the page into scroll before any content asks for it.
+     The vh line stays as the fallback for browsers without svh. */
+  min-height: 100vh;
+  min-height: 100svh;
+  isolation: isolate;
+  --hero-photo-url: url("../img/landing-page-hero.webp");
+}
+body.landing main { flex: 1; display: flex; flex-direction: column; }
+body.landing .hero { flex: 1; align-items: center; }
+
+/* Photo/scrim/gradient divs are promoted to top-level children of body and
+   positioned fixed to the viewport so they cover the entire screen — under
+   the nav, behind the hero, and behind the email + footer. Isolation on
+   body.landing keeps their negative z-index rendered between body's own
+   background and the flow content above. */
+body.landing > .hero__bg,
+body.landing > .hero__photo,
+body.landing > .hero__scrim {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body.landing > .hero__photo {
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+}
+
+/* Chrome nav mirrors the chrome boxes' semi-transparent dark tint,
+   subtle border, and frosted-glass backdrop. Positioned fixed so it floats
+   over the hero photo — the photo extends up to the top of the viewport
+   under the nav. Applies to every page that has a hero photo behind the
+   nav: the landing, consulting and studio brand heroes (`.hero--brand`)
+   plus reference cases (`.hero--blog`). */
+body:has(.hero--brand) .nav,
+body:has(.hero--blog) .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-glass-tint);
+  border-bottom: 1px solid var(--color-border);
+  -webkit-backdrop-filter: var(--blur-glass);
+          backdrop-filter: var(--blur-glass);
+}
+
+/* Promote the hero backdrop (bg + photo + scrim) to fixed positioning on
+   consulting / studio (`.hero--brand`) and reference case (`.hero--blog`)
+   pages so the photo fills the viewport and reads as one continuous image
+   behind the fixed frosted nav — mirroring the landing page pattern where
+   the photo already covers the whole screen. Isolation on the body keeps
+   the z-index: -1 backdrop rendered between body's dark background and the
+   flow content above. Isolation on `.hero` is turned off here (the base
+   rule sets it) so the fixed photo participates directly in body's
+   stacking context — otherwise `.hero` traps the photo in its own atom
+   which paints on top of later flow siblings like sections and footer,
+   hiding them. */
+body:has(.hero--brand),
+body:has(.hero--blog) {
+  isolation: isolate;
+}
+
+.hero--brand,
+.hero--blog {
+  isolation: auto;
+}
+
+.hero--brand .hero__bg,
+.hero--brand .hero__photo,
+.hero--brand .hero__scrim,
+.hero--blog .hero__bg,
+.hero--blog .hero__photo,
+.hero--blog .hero__scrim {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.landing-email {
+  align-self: center;
+  padding: 0.5rem 0;
+}
+
+/* ---------- Section template ---------- */
+.section {
+  padding: var(--section-gap) 0;
+  scroll-margin-top: calc(var(--nav-height) + 16px);
+}
+
+@media (min-width: 768px) {
+  :root { --nav-height: 96px; }
+}
+
+.section + .section { padding-top: 0; }
+
+.section__body {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Inline links inside body paragraphs and figure captions — underlined at rest
+   so they read as links, accent yellow on hover / focus. `.btn` is excluded so
+   buttons keep their own treatment. Listed selector by selector rather than
+   applied to the whole body so structured list/row links (.email-row,
+   .consultant-card__ref, etc.) aren't double-underlined. */
+.section__body p a:not(.btn),
+.section__figure-caption a:not(.btn) {
+  text-decoration: underline;
+}
+
+.section__body a:not(.btn):hover,
+.section__body a:not(.btn):focus-visible {
+  color: var(--color-accent);
+}
+
+/* Inline image + caption block for use inside section bodies (e.g. reference
+   case studies). Caption styling mirrors the studio services note. */
+/* Bulleted list inside a section body. base.css strips list markers globally,
+   so this restores them rather than leaning on the browser default. */
+.section__list {
+  list-style: disc;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.section__figure {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.section__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Portrait variant — crops the photo to a 4:5 frame and holds the figure at a
+   third of the body column width, so a tall image sits alongside the copy
+   instead of dominating it. Goes full width on narrow viewports, where a third
+   of a column is too small to read. */
+.section__figure--portrait img {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+/* Figure row matched on height rather than stretched to equal column widths —
+   for a pair whose aspect ratios differ, where equal widths would upscale the
+   narrower image and leave it towering over its neighbour. */
+.section__figure-row--natural img {
+  width: auto;
+  max-width: 100%;
+  max-height: 500px;
+  margin-inline: auto;
+}
+
+.section__figure-caption {
+  font-family: var(--font-body);
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+/* Small muted note inside a section body (e.g. footnotes / disclaimers).
+   Same visual weight as a figure caption. */
+.section__note {
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+/* Row of figures (e.g. two images side by side). Stacks on narrow viewports. */
+.section__figure-row {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 720px) {
+  .section__figure-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* --portrait also crops to 4:5; --third is width only, for images that
+     must keep their own aspect ratio. */
+  .section__figure--portrait,
+  .section__figure--third {
+    width: 33.333%;
+  }
+}
+
+/* ---------- Section chrome box (consulting + studio sections) ----------
+   Each section is wrapped in a titled panel. These are the last of the
+   terminal look and are kept deliberately: a labelled bar, no traffic
+   lights, so with the prompts and monospace gone they read as structure
+   rather than costume. Class names still say `terminal` — renaming them
+   touches every page, so it is left as its own job. Same tint, border, and
+   frosted backdrop. The chrome bar shows the section title, followed
+   by a `$ <slug>` prompt row above the content. */
+.section__terminal {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-glass-tint);
+  border: 1px solid var(--color-border);
+  -webkit-backdrop-filter: var(--blur-glass);
+          backdrop-filter: var(--blur-glass);
+}
+
+.section__terminal-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: none;
+  padding: 0.5rem 0.875rem;
+  background: var(--color-glass-highlight);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section__terminal-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.875rem, 1.05vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.section__terminal-body {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* ---------- Gallery listing ($ ls img/gallery/) ----------
+   Reframes the gallery as directory-listing output: a header line over a
+   dense grid of square thumbnails. Tiles carry no visible filename and
+   there is no footer — the whole run is on screen at once, so the images
+   are left to speak for themselves. */
+.gallery-listing {
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 1.05vw, 1rem);
+  color: var(--color-text);
+}
+
+/* Rows override the default gallery grid — switch to a responsive
+   file-browser-style icon grid: square thumbnails set close together,
+   captionless. */
+.gallery-listing__rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: clamp(0.5rem, 1vw, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  grid-auto-rows: auto;
+}
+
+.gallery-listing__rows > li {
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+/* Each tile is the thumbnail alone. */
+.gallery-listing .gallery__tile {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.gallery-listing .gallery__tile:hover,
+.gallery-listing .gallery__tile:focus-visible {
+  opacity: 0.75;
+  outline: none;
+}
+
+.gallery-listing .gallery__tile:focus-visible img {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.gallery-listing .gallery__tile img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-listing .gallery__tile::after { content: none; }
+
+/* ---------- Service list (package-list style) ----------
+   Each service renders as an expandable row: `[+] name  brief-summary`.
+   Clicking the row swaps [+] for [-] and reveals the longer body copy
+   beneath, aligned to the name column. Uses native <details>/<summary>
+   so no JS. */
+.service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-list > li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.service-line {
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.service-line__summary {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 0.25rem;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.service-line__summary::-webkit-details-marker { display: none; }
+.service-line__summary::marker { content: ""; }
+
+.service-line__summary:hover {
+  background: var(--color-glass-highlight);
+}
+
+.service-line__icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.service-line__name {
+  color: var(--color-cream);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: var(--lh-snug);
+}
+
+.service-line__toggle {
+  justify-self: end;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.service-line__toggle::before { content: "[+]"; }
+.service-line[open] > .service-line__summary .service-line__toggle::before { content: "[-]"; }
+
+.service-line__body {
+  padding: 0.25rem 0.25rem 1rem calc(24px + 0.75rem + 0.25rem);
+  color: var(--color-text);
+}
+
+.service-line__body > p { margin: 0; }
+
+/* ---------- Consultant card (portrait + key/value profile) ----------
+   Photo left, dl-style metadata right. Keys in accent yellow, values in
+   cream. Reads like `id` / `whoami` output next to the portrait. */
+.consultant-list {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.consultant-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--color-border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@media (min-width: 720px) {
+  .consultant-card {
+    grid-template-columns: minmax(0, 220px) 1fr;
+    align-items: start;
+  }
+}
+
+.consultant-card__portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.consultant-card__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.consultant-card__meta {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 1.05vw, 1rem);
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.consultant-card__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+}
+
+@media (min-width: 480px) {
+  .consultant-card__row {
+    grid-template-columns: 5.5rem 1fr;
+    gap: 1rem;
+  }
+}
+
+.consultant-card__key {
+  color: var(--color-accent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.consultant-card__val {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.consultant-card__val--strong {
+  color: var(--color-cream);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.consultant-card__ref {
+  color: var(--color-cream);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.consultant-card__ref:not([aria-disabled="true"]):hover,
+.consultant-card__ref:not([aria-disabled="true"]):focus-visible {
+  color: var(--color-accent);
+}
+
+/* Reference cases are disabled until the case pages are finished — the client
+   names stay readable, but drop the underline so they don't read as links. */
+.consultant-card__ref[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.consultant-card__ref-sep {
+  color: var(--color-text-subtle);
+  margin: 0 0.15rem;
+  user-select: none;
+}
+
+/* CV link — hyperlink treatment with a leading download-arrow icon so the
+   user knows this link downloads a file rather than navigating away. */
+.consultant-card__cv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-cream);
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.consultant-card__cv-text {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.consultant-card__cv:hover,
+.consultant-card__cv:focus-visible {
+  color: var(--color-accent);
+  outline: none;
+}
+
+.consultant-card__cv-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Contact section ---------- */
+.contact__head { margin-bottom: 0.5rem; }
+
+.contact__grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-top: 1rem;
+}
+
+.contact__side {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+@media (min-width: 768px) {
+  /* Form gets the wider column; aside is naturally compact. */
+  .contact__grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero--brand .hero__photo {
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
+}
+
+/* ====================================================================
+   Brand hero — every page
+   --------------------------------------------------------------------
+   Every page opens on a drawn wordmark in the same hand: True Friends on
+   the landing, Consulting and Studio on their own pages. One bold move
+   only — a flame-red offset behind the mark, standing in for the
+   misregistration you get from a cheap two-colour screen print.
+   ==================================================================== */
+.hero--brand {
+  text-align: center;
+  min-height: auto;
+  align-items: center;
+  padding: clamp(8rem, 14vw, 12rem) 0 clamp(4rem, 8vw, 6rem);
+}
+
+/* The landing is the odd one out: it IS the page, so it has to fit the
+   window. It is `flex: 1` inside body.landing and so already fills what
+   the email row and footer leave behind — the 80vh floor inherited from
+   `.hero` only ever pushes the column past the window on short viewports.
+   Padding stays modest for the same reason; the fixed 72px nav is cleared
+   by the centring, not by padding. Consulting and studio keep the taller
+   stack above, because they open onto sections below. */
+body.landing .hero--brand {
+  min-height: 0;
+  padding-block: clamp(1.5rem, 4vh, 3rem);
+}
+
+/* Vertical rhythm. A single flex gap spaced every row equally, which made
+   the lede look as attached to the button below it as to the title above —
+   proximity was encoding nothing. The rows are now steps on one modular
+   scale, ratio 1.618, so the spacing states the relationships:
+
+     mark -> page title    1.000  one lockup, tightest
+     lockup -> lede        1.618  the lede explains the title
+     lede -> say hi        2.618  reading ends, acting begins
+
+   One variable drives all three, so the whole stack retunes from a single
+   number and the ratios survive. */
+.hero__brand {
+  --rhythm: clamp(0.75rem, 1.4vw, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* The mark. drop-shadow follows the glyph outline rather than the box, so
+   the flame offset hugs the letterforms the way a second screen pass
+   would. Two stacked shadows: flame first, then a tight black bite to
+   stop the red vibrating against the yellow. Offsets are viewport-scaled
+   px, not em — this is an <h1>, so an em offset would key off the
+   inherited heading size rather than the artwork. The wordmark is roughly
+   8.2:1, so it spans the container instead of sitting as a small block. */
+/* --mark-offset is the flame shadow's distance. It lives here rather than
+   in the filter so each context can set its own: the offset is absolute px,
+   so the same value on a half-width mark reads twice as far from the
+   letterforms. */
+.hero__mark {
+  --mark-offset: clamp(2px, 0.4vw, 5px);
+  margin: 0;
+  width: 100%;
+  max-width: 56rem;
+}
+
+/* The offset lives on the image, not the <h1>: on the section pages the
+   heading also holds the page name, and that reads better flat. */
+.hero__mark img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter:
+    drop-shadow(var(--mark-offset) var(--mark-offset) 0 var(--color-flame))
+    drop-shadow(1px 1px 0 rgba(10, 10, 10, 0.55));
+}
+
+/* The landing lockup: the monogram sits as a badge over the wordmark. The
+   two images need their own widths — .hero__mark img is width: 100%, which
+   would otherwise stretch the near-square monogram to the wordmark's span
+   and stand it 56rem tall. The wordmark keeps the full container; the
+   monogram is capped to a fraction of it.
+
+   Both share the one --mark-offset from .hero__mark rather than taking a
+   scaled-down value the way the section mark does. The rule there is
+   offset-follows-width, but what the eye actually reads is offset against
+   stroke weight, and the monogram's strokes are roughly as heavy at 7rem as
+   the wordmark's are at 56rem — its glyphs are a fifth the width but drawn
+   at ten times the weight. Same offset, same misregistration. */
+.hero__mark--lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rhythm);
+}
+
+/* A percentage of the lockup, not a vw clamp. The wordmark sizes off the
+   container (width: 100%, capped at 56rem) while the old clamp(4rem, 9vw,
+   7rem) sized off the viewport, so the two scaled on different bases and the
+   lockup's proportion drifted from roughly 5:1 to 10:1 as the window
+   resized — it was only ever "right" at one width. Both images now resolve
+   against the same box, so the ratio is fixed everywhere, and the monogram
+   follows .hero__mark down to 40rem on short windows for free rather than
+   needing its own entry in that media query.
+
+   17.45% of a 56rem wordmark is ~156px against the wordmark's 110px cap
+   height — enough for the monogram to read as the senior element in the
+   lockup rather than a tag sitting on top of it. The odd number is the
+   round 18% scaled by 1378.38/1422, the inked fraction of the old box:
+   18% was tuned against artwork that sat flush to its box horizontally,
+   and the Archivo monogram instead carried 1.5% clear space left and
+   right, so cropping that away would have grown the glyph by as much. The crop's
+   real prize is vertical — 9.5% dead space top and bottom, which is what
+   used to inflate the gap below and leave the lockup reading looser than
+   --rhythm sets it. */
+.hero__mark-monogram {
+  max-width: 17.45%;
+}
+
+/* Consulting and studio: the page name IS the hero. It used to sit under a
+   small True Friends wordmark, which put the loudest treatment on the
+   smallest element and left the title flat — the hierarchy read backwards.
+   The wordmark is gone (the nav mark, the <title> and the footer all still
+   carry the name) and the flame moved up onto the page name, so the biggest
+   thing on the page is also the boldest. The landing keeps the full
+   monogram-over-wordmark lockup; that is where the brand introduces itself.
+
+   Drawn artwork rather than type, so the page names carry the logo's own
+   face. That costs a file per word per language, which is the trade: the
+   face is not one we can serve as a webfont.
+
+   Yellow, not cream, so one rule covers every hero mark on the site — the
+   landing wordmark is yellow with the same flame behind it, and a cream
+   page name would have made the section pages the exception. It also costs
+   the "say hi" button its monopoly on the accent, but the landing already
+   sets a giant yellow wordmark above yellow buttons, so that price is
+   already paid there. And the flame is specified as the hot note against
+   the yellow (see --color-flame): red on yellow is the pairing it was
+   picked for, red on cream was never the plan.
+
+   Sized by HEIGHT, not width — the one thing that matters here. The word
+   changes length between languages (CONSULTING is 7.0:1, KONSULT is 5.6:1),
+   so sizing by width would set the Swedish title at a smaller cap height
+   than the English one and the two would not look like the same design.
+   Height-sizing holds one cap height and lets each word run as long as it
+   runs, which is exactly what type does.
+
+   max-width and object-fit are insurance, not the mechanism: the clamp is
+   already tuned to fit CONSULTING — the widest of the three — inside the
+   container at every viewport down to 320px. If the width ever did clamp,
+   contain letterboxes it rather than stretching the letterforms. */
+.hero__mark--section {
+  display: flex;
+  justify-content: center;
+  /* Drops the 56rem cap inherited from .hero__mark. That cap sizes the
+     landing lockup; here height is the lever and a width cap would only
+     fight it. */
+  max-width: 100%;
+}
+
+.hero__mark--section img {
+  width: auto;
+  height: clamp(2.25rem, 9vw, 7rem);
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* The widest step on the scale: the lede finishes reading, the button
+   starts acting. This also overrides the base .hero__cta margin-top, which
+   would otherwise stack on top of the rhythm. */
+.hero--brand .hero__cta {
+  margin-top: calc(var(--rhythm) * 2.618);
+}
+
+.hero__lede {
+  /* Was 52ch here plus a `.hero p { max-width: 60ch }` elsewhere, which
+     won on specificity (0,1,1 vs 0,1,0) and silently rendered 60ch. One
+     rule now, holding the value that was actually in effect. */
+  max-width: 60ch;
+  margin: calc(var(--rhythm) * 1.618) 0 0;
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 1.15vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--color-cream);
+  text-wrap: balance;
+}
+
+/* Short windows: on the landing the lockup is the one element with room to
+   give, so shrink it rather than let the column overflow. Scoped to the
+   landing because it is the only page that has to fit the window — the
+   section pages open onto content below and scroll. Left unscoped it would
+   also clamp the section mark's width, and since that one is sized by
+   height, object-fit would letterbox it inside a box taller than the
+   artwork rather than simply making it smaller.
+
+   820px, not the 700px the gap rule below uses. The monogram is 18% of this
+   width, so raising it to a proper lockup ratio made the whole column ~50px
+   taller and pushed the squeeze up into the 768px-tall laptops that used to
+   clear it. The wordmark takes the monogram down with it, so one cap still
+   does the whole job. */
+@media (max-height: 820px) {
+  body.landing .hero__mark { max-width: 40rem; }
+}
+
+/* Left at 700px deliberately. This one is not scoped to the landing, so
+   widening it would retune the consulting and studio hero rhythm on window
+   heights that were never the problem. */
+@media (max-height: 700px) {
+  .hero__brand { gap: clamp(1rem, 2.5vw, 1.5rem); }
+}

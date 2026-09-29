@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>True Friends</title>
+    <meta name="description" content="True Friends is a creative and technical studio delivering visual design, user experience, testing and web development for ambitious projects.">
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://formsubmit.co; img-src 'self' data:; form-action 'self' https://formsubmit.co; base-uri 'self'; object-src 'none';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="index,follow">
+
+    <link rel="icon" type="image/svg+xml" href="img/tf-pc-favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <!-- Blocking on purpose: decides before first paint whether the
+         English markup is about to be translated. See the file. -->
+    <script src="js/lang-boot.js"></script>
+</head>
+<body class="landing">
+
+
+<svg class="tf-svg-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <symbol id="icon-linkedin" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.05-1.86-3.05-1.86 0-2.14 1.45-2.14 2.95v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.86 3.38-1.86 3.61 0 4.27 2.38 4.27 5.47v6.28zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.11 20.45H3.56V9h3.55v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.22 0z"/></symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.34 4.14.63c-.79.31-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.34 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.27 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.67 1.34 1.07 2.13 1.38.76.29 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.27 2.91-.56.79-.31 1.46-.72 2.13-1.38.67-.67 1.07-1.34 1.38-2.13.29-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.27-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13C21.32 1.35 20.65.94 19.86.63 19.1.34 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 100 12.32 6.16 6.16 0 000-12.32zm0 10.16a4 4 0 110-8 4 4 0 010 8zm6.41-10.4a1.44 1.44 0 100-2.88 1.44 1.44 0 000 2.88z"/></symbol>
+    <symbol id="icon-youtube" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.12C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.4.48A3 3 0 00.5 6.2 31.3 31.3 0 000 12a31.3 31.3 0 00.5 5.8 3 3 0 002.1 2.12C4.4 20.4 12 20.4 12 20.4s7.6 0 9.4-.48a3 3 0 002.1-2.12A31.3 31.3 0 0024 12a31.3 31.3 0 00-.5-5.8zM9.6 15.6V8.4l6.24 3.6-6.24 3.6z"/></symbol>
+  </defs>
+</svg>
+<div class="hero__bg" aria-hidden="true"></div>
+<div class="hero__photo" aria-hidden="true"></div>
+<div class="hero__scrim" aria-hidden="true"></div>
+
+<a href="#main" class="sr-only" data-i18n="aria.skip">Skip to content</a>
+
+<header class="nav" id="site-nav" data-open="false">
+    <div class="nav__inner">
+        <a href="#top" class="nav__brand" aria-label="True Friends home" data-i18n-aria-label="aria.home">
+            <img class="nav__brand-logo" src="img/tf-pc-logo-transparent.svg" alt=""
+                 width="1955" height="1491" decoding="async">
+            <img class="nav__brand-logo nav__brand-logo--hover" src="img/tf-pc-logo-yellow-transparent.svg" alt=""
+                 width="1955" height="1491" decoding="async" aria-hidden="true">
+        </a>
+
+        <div class="nav__right">
+            <a class="nav__era" href="1996/index.html"><span data-i18n="era.classic">TF 1996</span> <span class="nav__era-tail" data-i18n="era.classicTail">website</span></a>
+
+            <div class="nav__socials" aria-label="Social links" data-i18n-aria-label="aria.socialLinks">
+                <a class="social" data-href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" aria-disabled="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-linkedin"/></svg>
+                </a>
+                <a class="social" data-href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" aria-disabled="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-instagram"/></svg>
+                </a>
+                <a class="social" data-href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" aria-disabled="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-youtube"/></svg>
+                </a>
+            </div>
+
+
+            <div class="nav__langs" role="group" aria-label="Switch language" data-i18n-aria-label="aria.langSwitch">
+                <button type="button" class="nav__lang" data-lang="en" aria-pressed="true">EN</button>
+                <span class="nav__lang-divider" aria-hidden="true">/</span>
+                <button type="button" class="nav__lang" data-lang="sv" aria-pressed="false">SV</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main id="main">
+    <section class="hero hero--brand" id="top">
+        <div class="container hero__brand">
+            <h1 class="hero__mark hero__mark--lockup">
+                <img class="hero__mark-monogram" src="img/tf-pc-logo-transparent.svg"
+                     alt="" aria-hidden="true"
+                     width="1955" height="1491" decoding="async">
+                <img class="hero__mark-wordmark" src="img/tf-archivo-yellow-transparent.svg"
+                     alt="True Friends"
+                     width="3956" height="484" decoding="async">
+            </h1>
+
+            <p class="hero__lede" data-i18n="hero.lede">A creative and technical studio &amp; consulting firm based in Motala, Sweden, but available worldwide.</p>
+
+            <div class="hero__cta hero__cta--row">
+                <a class="btn" href="https://consulting.truefriends.se/"
+                   target="_blank" rel="noopener">
+                    <span data-i18n="hero.consulting">Consulting</span>
+                    <!-- Decorative: the accessible announcement is the sr-only text
+                         after it. An icon alone does not tell a screen-reader user
+                         that a new tab is about to open. -->
+                    <svg class="btn__external" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="square"
+                         aria-hidden="true">
+                        <path d="M14 4h6v6"/><path d="M20 4 11 13"/>
+                        <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+                    </svg>
+                    <span class="sr-only" data-i18n="aria.newTab">(opens in a new tab)</span>
+                </a>
+                <a class="btn" href="https://studio.truefriends.se/"
+                   target="_blank" rel="noopener">
+                    <span data-i18n="hero.studio">Studio</span>
+                    <!-- Decorative: the accessible announcement is the sr-only text
+                         after it. An icon alone does not tell a screen-reader user
+                         that a new tab is about to open. -->
+                    <svg class="btn__external" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="square"
+                         aria-hidden="true">
+                        <path d="M14 4h6v6"/><path d="M20 4 11 13"/>
+                        <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+                    </svg>
+                    <span class="sr-only" data-i18n="aria.newTab">(opens in a new tab)</span>
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<a class="email-row landing-email" href="mailto:hello@truefriends.se">
+    <span>hello@truefriends.se</span>
+</a>
+
+<footer class="site-footer">
+    <p class="site-footer__copyright" data-i18n="footer.copyright">&copy; True Friends 2026</p>
+</footer>
+
+<script src="js/translations/common.js" defer></script>
+<script src="js/translations/landing.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>

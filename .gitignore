@@ -1,0 +1,17 @@
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.coverage/
+coverage/
+dist/
+build/
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Design references dropped in while working — not site assets.
+img/17*.jpg

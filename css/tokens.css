@@ -1,0 +1,107 @@
+/*
+ * True Friends — Design Tokens
+ * Source of truth for colors, typography, spacing, radii, motion.
+ * Derived from True Friend Website File in Figma + brand logo (#FEE440).
+ */
+
+:root {
+  /* ---------- Color ---------- */
+  --color-bg: #0a0a0a;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-hover: rgba(255, 255, 255, 0.07);
+
+  --color-border-subtle: rgba(204, 213, 225, 0.10);
+  --color-border: rgba(204, 213, 225, 0.18);
+  --color-border-strong: rgba(204, 213, 225, 0.35);
+  --color-border-input: rgba(204, 213, 225, 0.22);
+
+  --color-text: #e8e6dc;
+  --color-text-strong: #ffffff;
+  --color-text-muted: rgba(232, 230, 220, 0.65);
+  --color-text-subtle: rgba(232, 230, 220, 0.45);
+
+  --color-cream: #faf9f5;
+  --color-nav-fg: var(--color-cream);
+  --color-nav-fg-hover: #fee440;
+
+  --color-accent: #fee440;
+  /* Flame red — the one hot note against the yellow/black ground. Rare by
+     design: button press, the stamped sticker, nothing else. */
+  --color-flame: #ff3b1f;
+  --color-accent-pressed: #e6cf3a;
+  --color-accent-ink: #0a0a0a;
+
+  --color-focus-ring: #fee440;
+
+  /* Frosted-glass surface used for the nav and the section chrome boxes
+     — a semi-transparent dark tint under a subtle warm-white
+     highlight. Combined with --blur-glass below they read as one
+     consistent chrome. */
+  --color-glass-tint: rgba(10, 10, 10, 0.5);
+  --color-glass-highlight: rgba(255, 255, 255, 0.03);
+
+  /* Backdrop filter applied to every glass surface. */
+  --blur-glass: blur(6px) saturate(120%);
+
+  /* Fallback gradient shown behind the hero photo. */
+  --gradient-hero:
+    radial-gradient(ellipse 80% 60% at 70% 65%, rgba(255, 140, 60, 0.35), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 20% 30%, rgba(20, 25, 50, 0.85), transparent 70%),
+    linear-gradient(180deg, #0a0a0a 0%, #1a1208 55%, #0a0a0a 100%);
+
+  /* ---------- Typography ---------- */
+  /* One voice. JetBrains Mono sets everything that is live text — headings,
+     body, nav, buttons, labels. Archivo used to take the display half, on
+     the argument that a heavy condensed sans against a monospace body is
+     the technical-documentation pairing. What retired it was the brand
+     heroes: once each page opened on a drawn mark, the display drama moved
+     to artwork and Archivo was left setting h2s, nav links and buttons —
+     small sizes where its 900 weight and 88% width axis read as nothing
+     more than a bold sans, while still costing its entire weight-and-width
+     variable payload.
+
+     The two tokens are kept separate and identical rather than collapsed
+     into one. They name roles, not files, so the display half can be
+     re-pointed at a second face later without touching a rule.
+
+     Headings take their authority from weight, size, case and tracking
+     instead of from a second family. That works here because the mark above
+     them is already doing the shouting. */
+  --font-display: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --font-body: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  /* Small caps have no ascenders or descenders to set a rhythm, so they are
+     opened up. There is no matching display value: --tracking-display was
+     -0.04em to pull in Archivo's generous sidebearings, and a monospace face
+     has a fixed advance width that negative tracking only crowds. */
+  --tracking-label: 0.03em;
+
+  --fs-caption: 0.75rem;
+
+  --lh-snug: 1.2;
+  --lh-relaxed: 1.65;
+
+  /* ---------- Layout / spacing ---------- */
+  --container-max: 1000px;
+  --container-padding: clamp(1.25rem, 4vw, 2.5rem);
+  --section-gap: clamp(5rem, 10vw, 7.5rem);
+  --nav-height: 72px;
+
+  /* ---------- Radii ---------- */
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+
+  /* ---------- Z-index ---------- */
+  --z-nav: 50;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+  }
+}

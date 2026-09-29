@@ -1,0 +1,846 @@
+/* True Friends — Design system components
+ * Buttons, inputs, nav, service items, social icons, modal, footer.
+ */
+
+/* ---------- Button ---------- */
+.btn {
+  --btn-bg: var(--color-accent);
+  --btn-fg: var(--color-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 48px;
+  padding: 0 1.25rem;
+  border-radius: 0;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.btn:hover {
+  --btn-bg: var(--color-cream);
+}
+
+.btn:active {
+  --btn-bg: var(--color-accent-pressed);
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn[aria-disabled="true"]:hover,
+.btn[aria-disabled="true"]:active {
+  --btn-bg: var(--color-accent);
+  transform: none;
+}
+
+/* The external-window mark on the landing's two destination buttons. Sized
+   to the button's own type rather than a fixed pixel value, so it tracks
+   the label. `square` line caps match the site's zero-radius geometry. */
+.btn__external {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  margin-left: 0.125rem;
+}
+
+.btn--outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-cream);
+  border: 2px solid var(--color-cream);
+}
+
+.btn--outline:hover {
+  --btn-bg: var(--color-cream);
+  --btn-fg: var(--color-bg);
+}
+
+/* ---------- Form ---------- */
+.field {
+  position: relative;
+  display: block;
+}
+
+.field__input,
+.field__textarea {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-border-input);
+  border-radius: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out);
+}
+
+.field__textarea {
+  height: 109px;
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 96px;
+}
+
+.field__input::placeholder,
+.field__textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.field__input:hover,
+.field__textarea:hover {
+  border-color: var(--color-border-strong);
+}
+
+.field__input:focus,
+.field__textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background: rgba(254, 228, 64, 0.04);
+}
+
+.field__input:invalid:not(:placeholder-shown),
+.field__textarea:invalid:not(:placeholder-shown) {
+  border-color: #ff7676;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 384px;
+}
+
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form__status {
+  font-size: var(--fs-small);
+  min-height: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.form__status:empty {
+  display: none;
+}
+
+.form__status[data-state="success"] { color: var(--color-accent); }
+.form__status[data-state="error"]   { color: #ff7676; }
+
+/* ---------- Top nav ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  background: rgba(10, 10, 10, 0.78);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.nav__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  column-gap: 1.5rem;
+  height: 72px;
+  padding: 0 var(--container-padding);
+}
+
+.nav__brand  { justify-self: start; }
+.nav__crumbs { justify-self: start; display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.nav__links  { justify-self: center; }
+
+.nav__crumb-sep {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text-subtle);
+  user-select: none;
+}
+
+.nav__crumb-current {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.nav__crumb-link {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.nav__crumb-link:hover,
+.nav__crumb-link:focus-visible {
+  color: var(--color-nav-fg-hover);
+}
+
+/* On narrow viewports the breadcrumb crumbs get squeezed against the
+   hamburger; drop the separator + current page to keep the brand readable. */
+@media (max-width: 480px) {
+  .nav__crumb-sep,
+  .nav__crumb-link,
+  .nav__crumb-current { display: none; }
+}
+
+.nav__right {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .nav__inner { height: 96px; }
+}
+
+/* Holds the two stacked wordmark images and no text, so it carries no type
+   properties — those were left from when the brand was the words "True
+   Friends", and `color` lost its last consumer when the hover became an
+   opacity swap between two files. */
+.nav__brand {
+  display: inline-grid;
+  align-items: center;
+}
+
+/* Two copies of the mark stacked in the same grid cell: white
+   underneath, yellow on top at zero opacity. Hover fades the yellow in,
+   and because both are the identical artwork it lands exactly over the
+   white, with no fade — the swap is instant. No colour maths, no mask,
+   no filter either: CSS cannot recolour the
+   fills inside an <img>, and masking the SVG failed because its root is
+   width="100%" height="100%", so it carries no intrinsic size. Two files
+   sidesteps all of it. */
+.nav__brand:hover .nav__brand-logo--hover { opacity: 1; }
+
+/* Sized by height, so the nav row stays put whatever the artwork's ratio.
+   The viewBox is cropped to the ink, so this height IS the glyph height —
+   no clear space to discount. The numbers are the uncropped 26/3.4/34
+   scaled by 1174.876/1451, the fraction of the old box that was actually
+   inked, so the mark renders at the size it did before the crop. */
+.nav__brand-logo {
+  grid-area: 1 / 1;
+  display: block;
+  height: clamp(21px, 2.75vw, 27.5px);
+  width: auto;
+}
+
+.nav__brand-logo--hover {
+  opacity: 0;
+}
+.nav__links {
+  display: none;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav__link {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: uppercase;
+  color: var(--color-nav-fg);
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.nav__link:hover { color: var(--color-nav-fg-hover); }
+
+.nav__link[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.nav__socials {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 0;
+}
+
+.nav__langs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav__lang {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: uppercase;
+  color: var(--color-nav-fg);
+  padding: 4px 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.nav__lang:hover {
+  color: var(--color-nav-fg-hover);
+}
+
+.nav__lang[aria-pressed="true"] {
+  color: var(--color-accent);
+}
+
+.nav__lang-divider {
+  color: var(--color-text-subtle);
+  font-size: 14px;
+  user-select: none;
+}
+
+.nav__langs--drawer {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0 0;
+}
+
+.nav__toggle:hover { background: var(--color-surface-hover); }
+
+.nav__toggle .icon-bar,
+.nav__toggle .icon-bar::before,
+.nav__toggle .icon-bar::after {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--color-text-strong);
+  border-radius: 2px;
+  transition: transform var(--duration-base) var(--ease-out),
+              opacity var(--duration-base) var(--ease-out);
+}
+
+.nav__toggle .icon-bar {
+  position: relative;
+}
+
+.nav__toggle .icon-bar::before,
+.nav__toggle .icon-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.nav__toggle .icon-bar::before { top: -7px; }
+.nav__toggle .icon-bar::after  { top: 7px; }
+
+.nav[data-open="true"] .nav__toggle .icon-bar {
+  background: transparent;
+}
+.nav[data-open="true"] .nav__toggle .icon-bar::before {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav[data-open="true"] .nav__toggle .icon-bar::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile drawer */
+.nav__drawer {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem var(--container-padding) 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.nav__drawer .nav__link {
+  padding: 0.875rem 0;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav__drawer .nav__socials {
+  display: flex;
+  margin-top: 0.75rem;
+}
+
+.nav[data-open="true"] .nav__drawer {
+  display: flex;
+}
+
+@media (min-width: 900px) {
+  .nav__links    { display: flex; }
+  .nav__socials  { display: flex; }
+  .nav__langs    { display: inline-flex; }
+  .nav__toggle   { display: none; }
+  .nav__drawer   { display: none !important; }
+}
+
+@media (max-width: 899px) {
+  /* Hide the desktop-only language switcher (the one in the right group);
+     drawer keeps its own. */
+  .nav__right .nav__langs { display: none; }
+}
+
+/* ---------- Social icons ---------- */
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-strong);
+  transition:
+    color var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.social:not([aria-disabled="true"]):hover { color: var(--color-accent); }
+
+.nav .social { color: var(--color-nav-fg); }
+.nav .social:not([aria-disabled="true"]):hover { color: var(--color-nav-fg-hover); }
+
+.social:not([aria-disabled="true"]):active { transform: scale(0.95); }
+
+/* Placeholder socials: the real profile URLs don't exist yet, so the markup
+   carries data-href instead of href (an <a> without href can't be activated
+   or focused). This is just the visual cue — matches .btn[aria-disabled]. */
+.social[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.social svg { width: 20px; height: 20px; }
+
+.socials-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Supplementary note shown beneath the services list. */
+.services__note {
+  margin-top: 0.5rem;
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: 0;
+  padding: 1rem var(--container-padding);
+  text-align: center;
+}
+
+.site-footer__copyright {
+  font-family: var(--font-display);
+  font-size: var(--fs-caption);
+  color: var(--color-text-subtle);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ---------- Modal ---------- */
+.modal {
+  width: 506px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  background: var(--color-bg);
+  color: var(--color-cream);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.modal__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px;
+  gap: 41px;
+  position: relative;
+}
+
+.modal__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.modal__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: normal;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--color-cream);
+  text-transform: none;
+}
+
+.modal__desc {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-self: stretch;
+  width: 100%;
+}
+
+.modal__form .field__textarea {
+  min-height: 109px;
+  height: 109px;
+}
+
+/* The contact form's submit spans the form, the way .modal__actions' pair
+   spans the modal — one action so the row is undivided, two actions so it
+   splits in half. Same structure either way, rather than a lone button
+   left stranded against one edge. */
+.form__actions {
+  display: flex;
+  width: 100%;
+}
+
+.form__actions .btn {
+  flex: 1;
+}
+
+.modal__actions {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.modal__actions .btn {
+  flex: 1;
+  height: 48px;
+  padding: 0;
+}
+
+@media (max-width: 540px) {
+  .modal__inner {
+    padding: 32px 20px;
+    gap: 28px;
+  }
+  .modal__form .form__row {
+    grid-template-columns: 1fr;
+  }
+  .modal__actions {
+    flex-direction: column-reverse;
+  }
+  .modal__actions .btn {
+    flex: none;
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+  }
+}
+
+/* Prevent body scroll while dialog is open */
+body:has(dialog[open]) { overflow: hidden; }
+
+/* ---------- Inline email row ---------- */
+.email-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--color-text-strong);
+  font-weight: 500;
+}
+
+.email-row:hover { color: var(--color-accent); }
+
+.email-row svg { width: 20px; height: 20px; flex: none; }
+
+.address-row {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  color: var(--color-text-strong);
+  font-weight: 500;
+  font-style: normal;
+}
+
+.address-row svg { width: 20px; height: 20px; flex: none; margin-top: 0.125rem; }
+
+.address-row > span { display: flex; flex-direction: column; }
+
+/* ---------- Gallery (base) ----------
+   Just the outer container; the actual tile grid + row-based icon view
+   is styled inside .gallery-listing in layout.css. */
+.gallery { display: grid; gap: 1.5rem; }
+
+.gallery__item[hidden] { display: none; }
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  background: var(--color-bg);
+  color: var(--color-cream);
+  overflow: hidden;
+}
+
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.lightbox__inner {
+  display: grid;
+  /* minmax(0, 1fr) lets the stage row shrink below its min-content so the
+     thumbnail row always has room — without it, a tall image stretches the
+     stage and pushes the thumbnails out of view. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  height: min(80vh, 720px);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.6);
+  color: var(--color-cream);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.lightbox__close:hover { color: var(--color-accent); }
+.lightbox__close svg { width: 22px; height: 22px; }
+
+.lightbox__stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  /* Image row absorbs available height; caption row sits in its own slot
+     so it can never collide with the thumbnail strip below. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px;
+  min-height: 0;
+}
+
+.lightbox__image {
+  grid-column: 2;
+  grid-row: 1;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background:
+    var(--color-surface)
+    url("../img/gallery/placeholder.svg") center / 96px no-repeat;
+}
+
+.lightbox__caption {
+  font-family: var(--font-body);
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+.lightbox__nav {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--color-cream);
+  border-radius: 0;
+  cursor: pointer;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.lightbox__nav:hover { color: var(--color-accent); }
+.lightbox__nav svg { width: 22px; height: 22px; }
+
+.lightbox__thumbs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.lightbox__thumb {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  background:
+    var(--color-surface)
+    url("../img/gallery/placeholder.svg") center / 28px no-repeat;
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.lightbox__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lightbox__thumb:hover { opacity: 0.85; }
+.lightbox__thumb[aria-current="true"] {
+  opacity: 1;
+  border-color: var(--color-accent);
+}
+
+@media (max-width: 720px) {
+  .lightbox__inner { height: min(85vh, 600px); }
+  .lightbox__image { max-height: calc(85vh - 200px); }
+  .lightbox__nav { width: 36px; height: 36px; }
+  .lightbox__thumb { width: 52px; height: 52px; }
+}
+
+/* ---------- Back-to-top button ---------- */
+.back-to-top {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: var(--z-nav);
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out);
+}
+
+.back-to-top[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover { background: var(--color-cream); }
+
+.back-to-top svg { width: 22px; height: 22px; }
+
+/* ---------------------------------------------------------------------------
+ * TF Classic
+ *
+ * A second copy of this site, built as a 1996 web browser, lives under
+ * /1996/. The way in is one chip at the head of the right-hand nav group —
+ * the first thing in that cluster, so it reads as an invitation rather than
+ * as another utility toggle.
+ *
+ * Unlike the socials and the language switcher it stays visible at every
+ * width, because on the landing page there is no drawer to hide it in. What
+ * gives way on a narrow screen is the second word.
+ * ------------------------------------------------------------------------ */
+
+.nav__era {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  flex: none;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-nav-fg);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+.nav__era:hover,
+.nav__era:focus-visible {
+  color: var(--color-accent-ink);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+@media (max-width: 599px) {
+  .nav__era-tail { display: none; }
+  .nav__era { padding: 0.28rem 0.5rem; }
+}
