@@ -1,0 +1,1614 @@
+/* ============================================================================
+ * True Friends 96 — a 1996 web browser, rendered in CSS.
+ *
+ * Two visual languages stacked on each other, and the line between them is
+ * the whole idea:
+ *
+ *   THE CHROME   Windows 95. Grey, bevelled, Tahoma, 12px. Everything from
+ *                the title bar down to the status bar, plus the taskbar and
+ *                every dialog. Built from the four bevel utilities below.
+ *
+ *   THE PAGE     The document inside the viewport. Times New Roman on white,
+ *                blue underlined links, 3D horizontal rules, outset table
+ *                borders, a tiled background behind a fixed-width column.
+ *                What the web actually looked like when Navigator 3 shipped.
+ *
+ * Form controls sit on the boundary and belong to the chrome, because in
+ * 1996 the browser drew them with the operating system's widgets.
+ *
+ * No images are needed for either language — bevels are box-shadows, icons
+ * are inline SVG, the wallpaper and the page texture are gradients. That
+ * keeps the CSP at default-src 'self' and the whole theme in one file.
+ * ========================================================================= */
+
+:root {
+  /* ---------- The Windows 95 system palette ---------- */
+  --w-face: #c0c0c0;          /* ButtonFace — every panel, button and bar   */
+  --w-face-light: #dfdfdf;    /* ButtonHighlight's softer inner step        */
+  --w-white: #ffffff;         /* ButtonHilight — top-left of a raised edge  */
+  --w-gray: #808080;          /* ButtonShadow — bottom-right, inner step    */
+  --w-ink: #000000;           /* WindowFrame — bottom-right, outer step     */
+  --w-disabled: #808080;
+
+  --w-desktop: #008080;       /* The famous teal                            */
+
+  --w-title-a: #000080;       /* Active title bar gradient, navy → azure    */
+  --w-title-b: #1084d0;
+  --w-title-fg: #ffffff;
+
+  --w-field: #ffffff;         /* Window/edit background                     */
+  --w-select: #000080;
+  --w-select-fg: #ffffff;
+
+  /* ---------- The document's palette ----------
+     Navigator's defaults, which is what every site of the era inherited and
+     most of them never changed. */
+  --doc-bg: #ffffff;
+  --doc-fg: #000000;
+  --doc-link: #0000ee;
+  --doc-visited: #551a8b;
+  --doc-active: #ee0000;
+  --doc-rule: #808080;
+
+  /* ---------- What survives from the brand ---------- */
+  /* The yellow is the one non-system colour in the build. It is rationed to
+     the masthead and the throbber so it reads as the site's colour rather
+     than as part of the operating system. */
+  --tf-yellow: #fee440;
+  --tf-navy: #000080;
+  --tf-green: #008000;
+
+  /* ---------- Type ----------
+     MS Sans Serif is long gone; Tahoma is its direct descendant and ships on
+     Windows and macOS alike — that sets the chrome. The document is Times,
+     which is what a browser rendered body text in until someone said
+     otherwise, and almost nobody did. */
+  --font-ui: Tahoma, "MS Sans Serif", "Segoe UI", Verdana, Geneva, sans-serif;
+  --font-doc: "Times New Roman", Times, Georgia, serif;
+  --font-mono: "Courier New", Courier, ui-monospace, monospace;
+
+  --fs-chrome: 12px;
+  --fs-small: 11.5px;
+  --fs-doc: 17px;
+
+  --page-max: 790px;
+  --taskbar-h: 34px;
+
+  /* How far the window sits from the screen edges. The maximised state and
+     the narrow breakpoint change these two and nothing else. */
+  --desk-pad: 16px;
+  --desk-foot: calc(var(--taskbar-h) + 20px);
+}
+
+/* ---------------------------------------------------------------------------
+ * The four bevels. Two nested 1px steps each, exactly as Win95 drew them:
+ *   .w-out  raised  — buttons, panels, window frames
+ *   .w-in   sunken  — text fields, list boxes, the viewport
+ *   .w-out-thin / .w-in-thin  single-step versions, for the toolbar rows and
+ *                              status cells where the double step is loud
+ * ------------------------------------------------------------------------ */
+.w-out {
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white);
+}
+.w-in {
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.w-out-thin {
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-gray),
+    inset  1px  1px 0 0 var(--w-white);
+}
+.w-in-thin {
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+
+/* ===========================================================================
+ * Reset + the desktop
+ * ======================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* The desktop is exactly one screenful and never scrolls. Everything the
+   visitor can read lives inside .viewport, which is the only scroller on the
+   page — there is nothing out on the teal to scroll to.
+   
+   Two things enforce that, and both are needed.
+   
+   `overflow: clip` rather than `hidden`, because a `hidden` box is still a
+   scroll container: it shows no scrollbar but script and fragment navigation
+   can still scroll it, and the visitor has no way to scroll back. Clicking a
+   nav anchor did exactly that — the window slid up out of the screen and
+   stayed there. `clip` creates no scroll container at all.
+   
+   And the window itself is pinned rather than laid out in the page, so there
+   is no in-flow content for anything to scroll in the first place. Firefox
+   was propagating the document's full height up past .viewport's containment
+   into the root's scrollable area — 2775px of it — where Chrome reported
+   none. Taking .browser out of flow settles the question in every engine
+   instead of relying on each one to contain overflow the same way. */
+html {
+  height: 100%;
+  overflow: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: clip;
+  font-family: var(--font-ui);
+  font-size: var(--fs-chrome);
+  color: var(--w-ink);
+  background-color: var(--w-desktop);
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(255, 255, 255, 0.022) 0 2px, transparent 2px 4px);
+  cursor: default;
+}
+
+img { max-width: 100%; height: auto; border: 0; }
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure, fieldset, blockquote { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+/* Win95 focus was a 1px dotted rectangle inset into the control. Keeping it
+   means keyboard users get an indicator that belongs to the era instead of a
+   modern glow bolted onto it. */
+:focus-visible {
+  outline: 1px dotted var(--w-ink);
+  outline-offset: -4px;
+}
+
+::selection { background: var(--w-select); color: var(--w-select-fg); }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.sr-only:focus {
+  position: fixed;
+  top: 6px; left: 6px;
+  width: auto; height: auto;
+  clip: auto; clip-path: none;
+  padding: 4px 10px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white);
+  z-index: 9999;
+}
+
+.svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Icons are drawn on a pixel grid, so smoothing them defeats the point. */
+.i { display: block; flex: none; shape-rendering: crispEdges; }
+
+/* ---------------------------------------------------------------------------
+ * The brand mark
+ *
+ * The mark has two states: white-bodied with a yellow screen at rest, and the
+ * inverse — all yellow, white screen — on hover. The yellow one appears
+ * nowhere else, which is what makes it read as a response rather than as a
+ * second logo.
+ *
+ * Both images are stacked and the top one fades in, so the swap needs no
+ * script and never reflows. It only ever sits inside something you can point
+ * at; the About dialog's copy is a plain <img> because a dialog illustration
+ * has nothing to respond to.
+ * ------------------------------------------------------------------------ */
+.tflogo {
+  position: relative;
+  display: block;
+  flex: none;
+  aspect-ratio: 1955 / 1491;
+}
+.tflogo__img {
+  display: block;
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.tflogo__img--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  /* Stepped rather than eased: this is a 256-colour operating system. */
+  transition: opacity 90ms steps(2, end);
+}
+/* Written out rather than folded into :where(a, button). The zero-specificity
+   form is correct on paper and matches when asked directly, but Chrome does
+   not reliably invalidate a descendant of it when :hover flips, so the swap
+   silently never happened. Four plain selectors always do. */
+a:hover .tflogo__img--hover,
+a:focus-visible .tflogo__img--hover,
+button:hover .tflogo__img--hover,
+button:focus-visible .tflogo__img--hover { opacity: 1; }
+
+/* ===========================================================================
+ * The browser window
+ * ======================================================================== */
+
+.browser {
+  position: fixed;
+  top: var(--desk-pad);
+  left: var(--desk-pad);
+  right: var(--desk-pad);
+  bottom: var(--desk-foot);
+  display: flex;
+  flex-direction: column;
+  max-width: 1180px;
+  margin-inline: auto;
+  background: var(--w-face);
+  padding: 3px;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white),
+    4px 4px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+body.is-maximized { --desk-pad: 0px; --desk-foot: var(--taskbar-h); }
+body.is-maximized .browser { max-width: none; }
+
+/* ---------- Title bar ---------- */
+
+.titlebar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 2px 2px 3px;
+  background: linear-gradient(90deg, var(--w-title-a) 0%, var(--w-title-b) 100%);
+  color: var(--w-title-fg);
+  user-select: none;
+}
+.titlebar__icon { width: 16px; height: 16px; }
+.titlebar__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+.titlebar__buttons { display: flex; gap: 2px; }
+.titlebar__btn {
+  width: 18px; height: 16px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+  cursor: pointer;
+}
+.titlebar__btn:active {
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.titlebar__btn--close { margin-left: 2px; }
+
+/* ---------- The chrome stack ----------
+ * Menu bar, toolbar, location bar and directory buttons travel together and
+ * stay pinned while the document scrolls beneath them, which is the single
+ * thing that makes a web page feel like it is inside a browser rather than
+ * merely styled like one.
+ * ------------------------------------------------------------------------ */
+
+.chrome {
+  position: relative;
+  z-index: 40;
+  flex: none;
+  background: var(--w-face);
+  padding-bottom: 2px;
+}
+
+.menubar {
+  display: flex;
+  align-items: stretch;
+  padding: 1px 0 2px;
+  border-bottom: 1px solid var(--w-gray);
+  box-shadow: 0 1px 0 0 var(--w-white);
+  margin-bottom: 2px;
+}
+.menubar__group { position: relative; display: flex; }
+.menubar__item {
+  padding: 3px 8px 4px;
+  border: 0;
+  background: none;
+  font-size: var(--fs-chrome);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.menubar__item:hover,
+.menubar__item[aria-expanded="true"] {
+  background: var(--w-select);
+  color: var(--w-select-fg);
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 196px;
+  padding: 2px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white),
+    3px 3px 0 0 rgba(0, 0, 0, 0.25);
+  z-index: 50;
+}
+.menu--right { left: auto; right: 0; }
+.menu[hidden] { display: none; }
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 3px 18px 3px 10px;
+  border: 0;
+  background: none;
+  font-size: var(--fs-chrome);
+  text-align: left;
+  text-decoration: none;
+  color: var(--w-ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.menu__item:visited { color: var(--w-ink); }
+.menu__item:hover:not([aria-disabled="true"]) {
+  background: var(--w-select);
+  color: var(--w-select-fg);
+}
+.menu__item[aria-disabled="true"] {
+  color: var(--w-disabled);
+  text-shadow: 1px 1px 0 var(--w-white);
+  cursor: default;
+}
+/* Checkable items reserve the tick column whether ticked or not, so the
+   labels stay on one left edge as things are switched on and off. */
+.menu__item--check::before {
+  content: "";
+  width: 10px;
+  flex: none;
+  margin-left: -6px;
+  font-size: 11px;
+  line-height: 1;
+}
+.menu__item--check[aria-pressed="true"]::before { content: "\2713"; }
+.menu__sep {
+  height: 2px;
+  margin: 3px 2px;
+  box-shadow:
+    inset 0  1px 0 0 var(--w-gray),
+    inset 0 -1px 0 0 var(--w-white);
+}
+.menu__key { margin-left: auto; padding-left: 22px; opacity: 0.75; }
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px 2px 4px;
+}
+.tbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+  padding: 3px 7px 2px;
+  border: 0;
+  background: var(--w-face);
+  font-size: var(--fs-small);
+  text-decoration: none;
+  color: var(--w-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.tbtn:visited { color: var(--w-ink); }
+.tbtn:active:not([aria-disabled="true"]) {
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.tbtn:active:not([aria-disabled="true"]) > * { transform: translate(1px, 1px); }
+/* Stop is only live while something is loading — greyed the rest of the time,
+   which is most of the time on a page this small. */
+.tbtn[aria-disabled="true"] {
+  color: var(--w-disabled);
+  text-shadow: 1px 1px 0 var(--w-white);
+  cursor: default;
+}
+.tbtn[aria-disabled="true"] .i { opacity: 0.45; }
+/* The way out to the current site. It is the only toolbar button that leaves
+   1996, so it gets the brand yellow behind it on hover — nothing else in the
+   chrome does. */
+.tbtn--travel:hover,
+.tbtn--travel:focus-visible { background: var(--tf-yellow); }
+
+.tbtn__sep {
+  width: 2px;
+  margin: 3px 4px;
+  flex: none;
+  box-shadow:
+    inset  1px 0 0 0 var(--w-gray),
+    inset -1px 0 0 0 var(--w-white);
+}
+
+/* The throbber. Navigator put its logo at the right end of the toolbar and
+   animated it while the connection was open; it was how you knew anything
+   was happening at all over a modem. */
+.throbber {
+  margin-left: auto;
+  align-self: center;
+  width: 44px; height: 38px;
+  display: grid;
+  place-items: center;
+  background: var(--w-title-a);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.throbber .tflogo { width: 28px; }
+body.is-loading .throbber .tflogo {
+  animation: throb 600ms steps(4, end) infinite;
+}
+@keyframes throb {
+  0%   { transform: translateY(0)    scale(1); }
+  50%  { transform: translateY(-2px) scale(1.06); }
+  100% { transform: translateY(0)    scale(1); }
+}
+
+/* ---------- Location bar ---------- */
+
+.locbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 4px;
+}
+.locbar__label { flex: none; font-weight: 700; }
+.locbar__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 0;
+  background: var(--w-field);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.locbar__go { min-width: 44px; padding: 5px 10px; }
+
+/* ---------- Directory buttons ---------- */
+
+.dirbar {
+  display: flex;
+  gap: 3px;
+  padding: 0 4px 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.dirbtn {
+  flex: none;
+  padding: 3px 11px 4px;
+  background: var(--w-face);
+  font-size: var(--fs-small);
+  text-decoration: none;
+  color: var(--w-ink);
+  white-space: nowrap;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.dirbtn:visited { color: var(--w-ink); }
+.dirbtn:active,
+.dirbtn[aria-current="page"] {
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.dirbtn[aria-current="page"] { font-weight: 700; }
+
+/* Options → Show Toolbar / Show Location / Show Directory Buttons.
+   Navigator had exactly these three, and hiding a row on a 640×480 screen
+   bought you a visible extra line of text. */
+body.hide-toolbar .toolbar,
+body.hide-location .locbar,
+body.hide-dirbar .dirbar { display: none; }
+
+/* ===========================================================================
+ * The viewport — everything below is the rendered document
+ * ======================================================================== */
+
+.viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 1px;
+  /* The scrollbar is chrome, so it gets the chrome's treatment — see the
+     ::-webkit-scrollbar rules below. */
+  padding: 0 0 26px;
+  background-color: #6f8f8f;
+  /* Tiled wallpaper behind a fixed-width column: the layout every site used
+     once monitors got wider than the text people wanted to read. */
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg,  rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 34px 34px;
+  background: var(--doc-bg);
+  color: var(--doc-fg);
+  font-family: var(--font-doc);
+  font-size: var(--fs-doc);
+  line-height: 1.6;
+}
+
+/* Document links: Navigator's blue, Navigator's purple, and red while the
+   mouse is down. Underlined, because turning that off was a 1998 idea. */
+.page a { color: var(--doc-link); }
+.page a:visited { color: var(--doc-visited); }
+.page a:active { color: var(--doc-active); }
+.page a:hover { color: var(--doc-active); }
+
+.page p + p,
+.page > * + * { margin-top: 0.85em; }
+
+/* The 3D groove rule, drawn the way the browser drew <hr>. */
+.rule {
+  height: 2px;
+  margin: 22px 0;
+  border: 0;
+  box-shadow:
+    inset 0  1px 0 0 var(--w-gray),
+    inset 0 -1px 0 0 var(--w-white);
+}
+.rule--tight { margin: 14px 0; }
+
+/* ---------- Masthead ---------- */
+
+.masthead {
+  margin: 0 -34px;
+  padding: 22px 34px;
+  background: linear-gradient(135deg, #000080 0%, #2d2d82 55%, #4a2a6e 100%);
+}
+/* The lockup is the link home, which is also what gives the mark something
+   to hover against. */
+.masthead__lockup {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  text-decoration: none;
+}
+.masthead__logo { width: 84px; }
+.masthead__word { width: min(300px, 100%); }
+.masthead--small { padding: 14px 34px; }
+.masthead--small .masthead__lockup { gap: 16px; }
+.masthead--small .masthead__logo { width: 52px; }
+.masthead--small .masthead__word { width: min(200px, 100%); }
+
+/* The marquee. One line, one page, and it holds still for anyone who has
+   asked the operating system to stop moving things. */
+.marquee {
+  margin: 0 -34px;
+  padding: 5px 0;
+  overflow: hidden;
+  background: var(--tf-yellow);
+  border-bottom: 2px solid var(--w-ink);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 26s linear infinite;
+}
+@keyframes marquee { to { transform: translateX(-100%); } }
+
+/* ---------- In-page navigation ---------- */
+
+.pagenav {
+  margin: 14px -34px 0;
+  padding: 7px 34px;
+  background: #e8e8e8;
+  border-top: 1px solid var(--w-white);
+  border-bottom: 1px solid var(--w-gray);
+  font-family: var(--font-ui);
+  font-size: var(--fs-chrome);
+  text-align: center;
+}
+.pagenav a { text-decoration: underline; }
+.pagenav__sep { color: var(--w-gray); padding: 0 4px; }
+
+/* ---------- Headings ---------- */
+
+.page h1 {
+  margin-top: 22px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.page h1 + .tagline {
+  margin-top: 4px;
+  font-size: 15px;
+  font-style: italic;
+  color: #444;
+}
+
+/* An h2 as a table header cell — a coloured band the full width of the
+   column — is the most 1996 gesture in the build and the clearest way to cut
+   a long page into sections. */
+.page h2 {
+  margin: 30px -34px 16px;
+  padding: 5px 34px 6px;
+  background: var(--tf-navy);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: var(--font-ui);
+}
+.page h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #8b0000;
+}
+
+.lede { font-size: 18px; font-weight: 700; }
+.backlink { margin-top: 6px; font-family: var(--font-ui); font-size: var(--fs-chrome); }
+.note {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: #444;
+}
+
+/* ---------- Service entries ----------
+ * Icon in a narrow left column, prose in the right: the two-cell table every
+ * list of anything used before floats were trusted.
+ * ------------------------------------------------------------------------ */
+
+.svc-list { display: grid; gap: 22px; }
+.svc {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 0 16px;
+}
+.svc__icon { width: 32px; height: 32px; margin-top: 4px; }
+.svc__name { grid-column: 2; }
+.svc__body { grid-column: 2; margin-top: 4px; }
+
+/* ---------- Tables ----------
+ * `border-style: outset` is what <table border="2"> looked like, and it is
+ * still the fastest way to say "1996" to anyone who was there.
+ * ------------------------------------------------------------------------ */
+
+.card {
+  display: grid;
+  grid-template-columns: 172px minmax(0, 1fr);
+  gap: 18px;
+  padding: 14px;
+  border: 2px outset var(--w-face);
+  background: #f4f4f4;
+}
+.card__photo { align-self: start; border: 2px inset var(--w-face); background: var(--w-face); }
+.card__photo img { display: block; width: 100%; }
+.card__meta { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px 12px; }
+.card__key {
+  font-family: var(--font-ui);
+  font-size: var(--fs-chrome);
+  font-weight: 700;
+  color: #333;
+  padding-top: 3px;
+}
+.card__key::after { content: ":"; }
+.card__val { min-width: 0; }
+.card__val--name { font-size: 21px; font-weight: 700; }
+.card__refs a { white-space: nowrap; }
+.card__sep { color: var(--w-gray); }
+
+/* ---------- Gallery ---------- */
+
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+  gap: 10px;
+}
+.thumbs__tile {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px outset var(--w-face);
+  background: var(--w-face);
+  cursor: pointer;
+}
+.thumbs__tile img {
+  display: block;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  background: #6b6b6b;
+}
+.thumbs__tile:active { border-style: inset; }
+.thumbs__tile:hover img { outline: 2px solid var(--doc-active); outline-offset: -2px; }
+
+/* ---------- The two doors on the front page ---------- */
+
+.doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.door {
+  display: block;
+  padding: 16px 18px;
+  border: 3px outset var(--w-face);
+  background: #f4f4f4;
+  color: var(--doc-fg);
+  text-decoration: none;
+}
+.door:visited { color: var(--doc-fg); }
+.door:active { border-style: inset; }
+.door__head { display: flex; align-items: center; gap: 12px; }
+.door__icon { width: 32px; height: 32px; flex: none; }
+.door__name { font-size: 21px; font-weight: 700; color: var(--doc-link); text-decoration: underline; }
+.door:hover .door__name { color: var(--doc-active); }
+.door__desc { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--doc-fg); }
+
+/* ---------- Contact form ----------
+ * Form controls belonged to the operating system in 1996, so these are the
+ * only part of the document drawn in the chrome's language.
+ * ------------------------------------------------------------------------ */
+
+.form-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+  font-family: var(--font-ui);
+  font-size: var(--fs-chrome);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field { display: block; margin-bottom: 9px; }
+.field__label { display: block; margin-bottom: 3px; }
+.input, .textarea {
+  display: block;
+  width: 100%;
+  padding: 4px 5px;
+  border: 0;
+  border-radius: 0;
+  background: var(--w-field);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.textarea { min-height: 112px; resize: vertical; }
+.honeypot { position: absolute; left: -9999px; opacity: 0; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 84px;
+  padding: 6px 16px;
+  border: 0;
+  background: var(--w-face);
+  font-family: var(--font-ui);
+  font-size: var(--fs-chrome);
+  color: var(--w-ink);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.btn:visited { color: var(--w-ink); }
+.btn:active:not(:disabled) {
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.btn:active:not(:disabled) > * { transform: translate(1px, 1px); }
+.btn:disabled { color: var(--w-disabled); text-shadow: 1px 1px 0 var(--w-white); cursor: default; }
+/* The default button in a Win95 dialog carried an extra 1px black ring. */
+.btn--default {
+  margin: 1px;
+  box-shadow:
+    0 0 0 1px var(--w-ink),
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+
+.form__actions { display: flex; gap: 8px; margin-top: 10px; }
+.form__status { margin-top: 8px; min-height: 1.2em; }
+.form__status[data-state="error"] { color: #a80000; font-weight: 700; }
+.form__status[data-state="success"] { color: var(--tf-green); font-weight: 700; }
+
+.info-rows { display: grid; gap: 9px; }
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  text-decoration: none;
+  font-style: normal;
+}
+.info-row span span { display: block; }
+.socials { display: flex; gap: 6px; margin-top: 12px; }
+.social {
+  display: grid;
+  place-items: center;
+  width: 30px; height: 28px;
+  background: var(--w-face);
+  color: var(--w-ink);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.social[aria-disabled="true"] { color: var(--w-disabled); cursor: default; }
+
+/* ---------- Page footer ---------- */
+
+.pagefoot {
+  margin-top: 26px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  text-align: center;
+  color: #444;
+}
+.pagefoot a { text-decoration: underline; }
+.pagefoot > * + * { margin-top: 8px; }
+
+/* The hit counter. It is a real count — of this visitor's own page views,
+   kept in their browser and nowhere else — dressed as the odometer every
+   site bolted to its front page. */
+.counter { display: flex; justify-content: center; align-items: center; gap: 8px; }
+.counter__digits { display: flex; gap: 1px; }
+.counter__digits span {
+  width: 15px;
+  padding: 2px 0;
+  background: #101010;
+  color: #33ff55;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid var(--w-gray);
+}
+
+/* The way across to the other era, in the footer where a 1996 site put its
+   "this page is also available in…" line. */
+.timewarp { font-size: var(--fs-small); }
+.timewarp a { text-decoration: underline; }
+
+.badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+/* The 88x31 web badge: a flat block with a hairline rule around it. The
+   outset border it used to carry made these read as buttons you could press,
+   which is the one thing a badge never was. */
+.badge {
+  padding: 4px 10px;
+  border: 1px solid var(--w-ink);
+  background: var(--tf-yellow);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--w-ink);
+}
+
+/* "NEW!" beside a link, the way it was stamped on anything added that month. */
+.new-flag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  background: #d40000;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  vertical-align: 2px;
+}
+
+/* ---------- Images Off ----------
+ * Options → Auto Load Images. Turning it off is what you did on a modem, and
+ * it is why alt text was written carefully. The placeholder is the broken
+ * image icon Navigator drew in the gap.
+ * ------------------------------------------------------------------------ */
+
+body.no-images .page img { display: none; }
+body.no-images .figure .alt-slug,
+body.no-images .card__photo .alt-slug { display: inline-flex; margin: 4px 0; }
+body.no-images .masthead,
+body.no-images .throbber { background: var(--w-face); }
+body.no-images .alt-slug { display: inline-flex; }
+.alt-slug {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border: 1px solid var(--w-gray);
+  background: #f0f0f0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  color: #333;
+}
+.alt-slug .i { width: 16px; height: 16px; }
+
+/* ---------- Scrollbar ---------- */
+
+.viewport::-webkit-scrollbar { width: 16px; height: 16px; }
+.viewport::-webkit-scrollbar-track {
+  background-color: #d4d0c8;
+  background-image: repeating-conic-gradient(var(--w-white) 0 25%, transparent 0 50%);
+  background-size: 2px 2px;
+}
+.viewport::-webkit-scrollbar-thumb {
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.viewport::-webkit-scrollbar-button:single-button {
+  display: block;
+  height: 16px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.viewport::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image:
+    linear-gradient(45deg, transparent 43%, var(--w-ink) 43% 57%, transparent 57%),
+    linear-gradient(-45deg, transparent 43%, var(--w-ink) 43% 57%, transparent 57%);
+  background-size: 7px 4px;
+  background-position: center 7px, center 7px;
+  background-repeat: no-repeat;
+}
+.viewport::-webkit-scrollbar-corner { background: var(--w-face); }
+
+/* Firefox has no scrollbar pseudo-elements; the standard properties are all
+   it exposes, and setting them anywhere Chrome can see turns the rules above
+   off entirely — hence the guard. */
+@supports not selector(::-webkit-scrollbar) {
+  .viewport { scrollbar-width: auto; scrollbar-color: var(--w-face) #d4d0c8; }
+}
+
+/* ===========================================================================
+ * Status bar
+ * ======================================================================== */
+
+.statusbar {
+  flex: none;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 120px auto;
+  gap: 3px;
+  padding: 4px 2px 2px;
+  background: var(--w-face);
+}
+.statusbar__cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  min-width: 0;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+/* The message area doubles as the link preview: hovering any link in the
+   document prints its address here, exactly as it did then. */
+.statusbar__msg {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.statusbar__cell--secure { cursor: pointer; }
+
+.meter { padding: 4px 4px; }
+.meter__bar {
+  width: 100%; height: 11px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+/* Win95 progress bars were a row of discrete navy chips, never a smooth
+   fill. The gradient draws the chips; the width steps so they appear one at
+   a time. */
+.meter__fill {
+  height: 100%;
+  width: 0;
+  background-image: linear-gradient(90deg, var(--w-title-a) 0 7px, transparent 7px 9px);
+  background-size: 9px 100%;
+  transition: width 120ms steps(3, end);
+}
+
+/* ===========================================================================
+ * Taskbar
+ * ======================================================================== */
+
+.taskbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--taskbar-h);
+  padding: 2px 3px;
+  background: var(--w-face);
+  box-shadow:
+    inset 0 1px 0 0 var(--w-white),
+    inset 0 2px 0 0 var(--w-face-light);
+}
+.taskbar__start-logo { width: 19px; }
+
+.taskbar__start {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 4px 5px;
+  border: 0;
+  background: var(--w-face);
+  font-size: var(--fs-chrome);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.taskbar__start[aria-expanded="true"] {
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.taskbar__sep {
+  width: 2px;
+  align-self: stretch;
+  margin: 2px 3px;
+  flex: none;
+  box-shadow:
+    inset  1px 0 0 0 var(--w-gray),
+    inset -1px 0 0 0 var(--w-white);
+}
+.taskbar__tasks { display: flex; gap: 3px; flex: 1 1 auto; min-width: 0; }
+/* One browser, one taskbar button, captioned with whatever page is open —
+   which is the whole point of moving from an app window to a browser. */
+.taskbar__task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 260px;
+  padding: 4px 9px;
+  border: 0;
+  background: var(--w-face);
+  font-size: var(--fs-chrome);
+  font-weight: 700;
+  text-align: left;
+  color: var(--w-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  background-image: repeating-conic-gradient(var(--w-white) 0 25%, transparent 0 50%);
+  background-size: 2px 2px;
+  box-shadow:
+    inset  1px  1px 0 0 var(--w-ink),
+    inset -1px -1px 0 0 var(--w-white),
+    inset  2px  2px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light);
+}
+.taskbar__task span { overflow: hidden; text-overflow: ellipsis; }
+body.is-minimized .taskbar__task {
+  background-image: none;
+  font-weight: 400;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+.taskbar__tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 9px;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+
+.startmenu {
+  position: fixed;
+  left: 3px;
+  bottom: var(--taskbar-h);
+  z-index: 110;
+  display: flex;
+  min-width: 236px;
+  padding: 3px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white),
+    3px -3px 0 0 rgba(0, 0, 0, 0.25);
+}
+.startmenu[hidden] { display: none; }
+.startmenu__spine {
+  width: 24px;
+  flex: none;
+  margin-right: 3px;
+  background: linear-gradient(0deg, var(--w-title-a) 0%, #4a4a8f 100%);
+  color: var(--w-title-fg);
+  font-size: 15px;
+  font-weight: 700;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px 4px;
+}
+.startmenu__spine b { color: var(--tf-yellow); }
+.startmenu__list { flex: 1 1 auto; display: grid; align-content: start; }
+.startmenu__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 22px 6px 8px;
+  border: 0;
+  background: none;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  color: var(--w-ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.startmenu__item:visited { color: var(--w-ink); }
+.startmenu__item:hover { background: var(--w-select); color: var(--w-select-fg); }
+.startmenu__item .i { width: 24px; height: 24px; }
+/* The one raster icon in the build; everything else is drawn in the sprite. */
+.startmenu__icon { width: 24px; height: 24px; flex: none; image-rendering: pixelated; }
+.dlg__icon { width: 32px; height: 32px; flex: none; image-rendering: pixelated; }
+
+/* ===========================================================================
+ * Dialogs
+ * ======================================================================== */
+
+dialog {
+  padding: 0;
+  border: 0;
+  background: var(--w-face);
+  color: var(--w-ink);
+  max-width: min(94vw, 640px);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white),
+    4px 4px 0 0 rgba(0, 0, 0, 0.35);
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
+.dlg { padding: 3px; }
+.dlg__body { padding: 14px 14px 12px; font-size: 13px; line-height: 1.55; }
+.dlg__body p + p { margin-top: 0.8em; }
+.dlg__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+/* An icon beside a paragraph — the shape of every message box ever shipped. */
+.dlg__msg { display: flex; gap: 14px; align-items: flex-start; }
+.dlg__msg > .i { width: 32px; height: 32px; margin-top: 2px; }
+.dlg__logo { width: 56px; height: 43px; flex: none; object-fit: contain; }
+
+.keys {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 14px;
+  margin-top: 10px;
+  align-items: baseline;
+}
+.keys dt { white-space: nowrap; }
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 2px 6px;
+  background: var(--w-face);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-align: center;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-face-light);
+}
+
+.info-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; }
+.info-grid dt { white-space: nowrap; font-weight: 700; }
+.info-grid dd { font-family: var(--font-mono); font-size: 12px; word-break: break-all; }
+.info-grid .ok { color: var(--tf-green); font-weight: 700; font-family: var(--font-ui); }
+
+/* Find dialog */
+.find-row { display: flex; gap: 8px; align-items: flex-end; }
+.find-row .field { flex: 1 1 auto; margin: 0; }
+mark.find-hit { background: var(--tf-yellow); color: #000; }
+mark.find-hit[data-current="true"] { background: var(--doc-active); color: #fff; }
+
+.ascii {
+  overflow-x: auto;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.02;
+  white-space: pre;
+  background: var(--w-field);
+  color: #101010;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+
+/* ---------- DOOM ----------
+ * A DOS window inside a Windows window. The Archive's player wants a 4:3
+ * box and supplies its own chrome inside it, so all this does is give it a
+ * sunken frame to sit in. */
+.doomwin { max-width: 96vw; }
+.doomwin__screen {
+  margin: 3px;
+  padding: 4px;
+  background: #000;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+/* 640x400 — DOOM's 320x200 at exactly 2x, which is how it was meant to be
+   looked at and the size the emulator renders at natively. A bigger window
+   does not make a bigger game: the player paints its canvas at its own size
+   and leaves the rest black, so the window is sized to the game rather than
+   the other way round. Shrinks proportionally if the screen is narrow, which
+   below 760px cannot happen anyway — the mobile gate has taken over. */
+.doomwin__frame {
+  display: block;
+  width: min(640px, 86vw);
+  aspect-ratio: 16 / 10;
+  border: 0;
+  background: #000;
+}
+.doomwin__keys { position: static; grid-template-columns: minmax(0, 1fr); }
+
+/* Greyed rather than hidden: the entry has to be there to be pressed. */
+.startmenu__item[aria-disabled="true"] {
+  color: var(--w-disabled);
+  text-shadow: 1px 1px 0 var(--w-white);
+}
+.startmenu__item[aria-disabled="true"] .i { opacity: 0.5; }
+.startmenu__item[aria-disabled="true"]:hover {
+  background: none;
+  color: var(--w-disabled);
+}
+
+/* Image viewer */
+.viewer { max-width: min(96vw, 1000px); }
+.viewer__stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  margin: 3px;
+  background: #3a3a3a;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.viewer__img {
+  display: block;
+  max-width: 100%;
+  max-height: min(66vh, 620px);
+  margin: 0 auto;
+  object-fit: contain;
+}
+.viewer__nav { width: 28px; min-width: 0; height: 56px; padding: 0; }
+.viewer__strip {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 5px;
+  margin: 0 3px 3px;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray);
+}
+.viewer__strip button {
+  flex: none;
+  width: 50px; height: 50px;
+  padding: 2px;
+  border: 0;
+  background: var(--w-face);
+  cursor: pointer;
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-white);
+}
+.viewer__strip button[aria-current="true"] { background: var(--w-select); box-shadow: none; }
+.viewer__strip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.viewer .statusbar { position: static; grid-template-columns: minmax(0, 1fr); justify-items: start; }
+.viewer .statusbar__cell { min-width: 108px; justify-content: center; }
+
+/* ===========================================================================
+ * Connecting splash — the dial-up handshake, once per session
+ * ======================================================================== */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  background: #000;
+  padding: 20px;
+}
+.boot[hidden] { display: none; }
+.boot__panel {
+  width: min(430px, 92vw);
+  padding: 3px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-ink),
+    inset  1px  1px 0 0 var(--w-face-light),
+    inset -2px -2px 0 0 var(--w-gray),
+    inset  2px  2px 0 0 var(--w-white);
+}
+.boot__body { display: flex; gap: 14px; padding: 16px 16px 14px; align-items: flex-start; }
+.boot__body .i { width: 32px; height: 32px; flex: none; }
+.boot__text { font-size: 13px; line-height: 1.6; }
+.boot__meter {
+  height: 18px;
+  margin: 10px 16px 16px;
+  padding: 2px;
+  background: var(--w-face);
+  box-shadow:
+    inset -1px -1px 0 0 var(--w-white),
+    inset  1px  1px 0 0 var(--w-gray),
+    inset -2px -2px 0 0 var(--w-face-light),
+    inset  2px  2px 0 0 var(--w-ink);
+}
+.boot__fill {
+  height: 100%;
+  width: 0;
+  background-image: linear-gradient(90deg, var(--w-title-a) 0 10px, transparent 10px 12px);
+  background-size: 12px 100%;
+  animation: boot-fill 1500ms steps(18, end) forwards;
+}
+@keyframes boot-fill { to { width: 100%; } }
+
+/* ===========================================================================
+ * Reference cases — the same document with a client banner on top
+ * ======================================================================== */
+
+.casebanner {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  margin: 0 -34px;
+  padding: 24px;
+  overflow: hidden;
+  background: #1b1b1b;
+}
+.casebanner__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* Client logos arrive in every colour there is, so the photo is dimmed to
+     a flat dark ground rather than trusted to contrast with them. */
+  opacity: 0.7;
+}
+.casebanner__logo {
+  position: relative;
+  max-width: min(320px, 70%);
+  max-height: 108px;
+  object-fit: contain;
+}
+
+.figure { margin: 20px 0; }
+.figure img { display: block; width: 100%; border: 2px inset var(--w-face); background: var(--w-face); }
+.figure__cap {
+  margin-top: 6px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  color: #444;
+}
+.figure-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.figure-row .figure { margin: 0; }
+
+/* ===========================================================================
+ * Window states the title bar switches on
+ * ======================================================================== */
+
+body.is-minimized .chrome,
+body.is-minimized .viewport,
+body.is-minimized .statusbar { display: none; }
+body.is-minimized .browser { bottom: auto; }
+
+/* ===========================================================================
+ * Responsive
+ * ======================================================================== */
+
+@media (max-width: 860px) {
+  .page { padding: 0 20px 28px; }
+  .masthead, .page h2, .pagenav, .marquee, .casebanner { margin-left: -20px; margin-right: -20px; }
+  .masthead, .page h2, .pagenav { padding-left: 20px; padding-right: 20px; }
+  .form-block { grid-template-columns: minmax(0, 1fr); }
+  .card { grid-template-columns: minmax(0, 1fr); }
+  .card__photo { max-width: 180px; }
+}
+
+@media (max-width: 680px) {
+  :root { --desk-pad: 8px; --desk-foot: calc(var(--taskbar-h) + 12px); }
+  .toolbar { overflow-x: auto; }
+  .tbtn { min-width: 0; padding: 4px 8px 3px; }
+  .tbtn__label { display: none; }
+  .throbber { width: 34px; height: 30px; }
+  .throbber img { width: 22px; height: 17px; }
+  .locbar__label { display: none; }
+  .statusbar { grid-template-columns: auto minmax(0, 1fr); }
+  .statusbar .meter, .statusbar__cell--mail { display: none; }
+  .page { font-size: 16px; }
+  .page h1 { font-size: 25px; }
+  .svc { grid-template-columns: minmax(0, 1fr); }
+  .svc__icon { display: none; }
+  .svc__name, .svc__body { grid-column: 1; }
+  .card__meta { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .card__key { padding-top: 8px; }
+}
+
+@media (max-width: 420px) {
+  .field-row { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot__fill { animation-duration: 1ms; }
+  .marquee span { animation: none; padding-left: 0; }
+  .throbber img, body.is-loading .throbber img { animation: none; }
+  .meter__fill { transition: none; }
+}
+
+/* ===========================================================================
+ * Print — the Print button is real, so the printed page has to be too.
+ * The browser disappears and the document prints as a document.
+ * ======================================================================== */
+
+@media print {
+  /* Undo the one-screen lock, or the printer gets a single screenful. */
+  html, body { height: auto; overflow: visible; }
+  .browser { position: static; inset: auto; }
+  body { padding: 0; background: #fff; }
+  .titlebar, .chrome, .statusbar, .taskbar, .startmenu, .boot,
+  .marquee, .throbber, dialog { display: none !important; }
+  .browser { max-width: none; padding: 0; box-shadow: none; }
+  .viewport { background: #fff; padding: 0; box-shadow: none; overflow: visible; }
+  .page { max-width: none; padding: 0; }
+  .masthead, .page h2, .pagenav, .casebanner { margin-left: 0; margin-right: 0; }
+  .page h2 { background: #fff; color: #000; border-bottom: 2px solid #000; }
+  .form-block, .socials, .badges, .counter { display: none; }
+  .figure, .card, .svc { break-inside: avoid; }
+  .page a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; }
+}
+
+/* Held back by js/lang-boot.js while a Swedish visitor's page is still
+   English in the markup. `visibility` rather than `display` so layout
+   resolves underneath and nothing reflows when it lifts — and the body
+   background still paints, so it reads as the page arriving, not a blank
+   screen. English visitors never get this attribute. */
+html[data-tf-translating] body {
+  visibility: hidden;
+}
