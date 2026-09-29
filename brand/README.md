@@ -35,3 +35,34 @@ variant — files that belong to the consulting site and do not exist here.
 Neither the landing page nor TF Classic reads that key, so both have been
 trimmed. If you copy `common.js` from another repository in future, trim them
 again.
+
+## Two rules worth knowing before you redesign
+
+Everything else about how a site looks is yours to change. These two are not
+preferences — they are things that will cost you an afternoon if you learn them
+the hard way.
+
+### The brand colours cannot be text on a light ground
+
+Measured contrast against each candidate ground:
+
+| | on ink `#0a0a0a` | on cream `#faf9f5` | on white |
+|---|---|---|---|
+| yellow `#fee440` | **15.45** — body text | 1.22 — unusable | 1.28 — unusable |
+| flame `#ff3b1f` | **5.56** — body text | 3.38 — large only | 3.56 — large only |
+
+On dark, both work as ink and yellow is the natural text accent. **On light,
+neither can set body text.** Yellow can only be a fill with ink knocked out of
+it; flame is limited to 24px+ or 19px-bold, so headings and large UI only.
+
+A light-ground site that wants yellow emphasis has to invent a fill-based
+device. That is not a style choice, it is the only option left.
+
+### Do not recolour the logo
+
+`tf-pc-logo-transparent.svg` is drawn artwork carrying three colours — a
+near-black body, a white screen and a yellow smiley. Treating it as a
+silhouette destroys the screen and the face. A CSS `filter: brightness(0)`
+turns it into a black blob; this has been tried.
+
+Use the all-yellow variant only over a dark ground, where it reads.
