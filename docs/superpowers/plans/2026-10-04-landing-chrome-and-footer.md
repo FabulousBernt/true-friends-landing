@@ -229,9 +229,18 @@ if (!grad) {
   }
 }
 
-/* ---- report ---- */
+/* ---- report ----
+   A section header is followed immediately by its items, with no blank line
+   between them. That is deliberate: the blank line goes ABOVE the header, so
+   `sed -n '/^DEAD$/,/^HUE$/p'` captures a whole section. Leading the section
+   with a blank line instead makes that range stop on the first line and
+   silently print a header and nothing else. */
 const count = (label, arr) => console.log('  ' + label.padEnd(26) + arr.length);
-const list = (arr) => console.log('\n  ' + arr.join('\n  '));
+const section = (label, arr) => {
+  if (!arr.length) return;
+  console.log('\n' + label);
+  console.log(arr.map(x => '  ' + x).join('\n'));
+};
 
 console.log('check-css — index.html against the four stylesheets it loads\n');
 console.log(`  ${inHtml.size} classes in markup, ${declared.size} class rules, ${tokens.length} tokens\n`);
@@ -239,10 +248,10 @@ count('DEAD  rule, no element', dead);
 count('TOKEN declared, no reader', unused);
 count('HUE   chromatic gradient', chromatic);
 count('WARN  unstyled (advisory)', unstyled);
-if (dead.length) { console.log('\nDEAD'); list(dead); }
-if (unused.length) { console.log('\nTOKEN'); list(unused); }
-if (chromatic.length) { console.log('\nHUE'); list(chromatic); }
-if (unstyled.length) { console.log('\nWARN'); list(unstyled); }
+section('DEAD', dead);
+section('TOKEN', unused);
+section('HUE', chromatic);
+section('WARN', unstyled);
 
 const failures = dead.length + unused.length + chromatic.length;
 console.log(`\n${failures} problem(s)`);
