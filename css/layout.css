@@ -68,11 +68,18 @@ body.landing .hero__scrim {
   justify-self: center;
 }
 
+/* The 40px is the gap between the two buttons side by side, which is the
+   reading order and the one worth the air. When the row wraps — it does below
+   about 370px of viewport, where two 150px buttons and the gap no longer fit
+   inside the container — the same 40px becomes the gap between them stacked,
+   and 24px of a 640px window is a lot to spend on that. row-gap only ever
+   applies once the row has wrapped. */
 .hero__cta--row {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 40px;
+  column-gap: 40px;
+  row-gap: 1rem;
 }
 
 /* ---------- Landing page layout ---------- */
@@ -199,15 +206,24 @@ body.landing .hero--brand {
    proximity was encoding nothing. The rows are now steps on one modular
    scale, ratio 1.618, so the spacing states the relationships:
 
-     mark -> lede     1.618  the lede explains the mark
+     mark -> name     1.000  the name belongs to the mark
+     name -> lede     1.618  the lede explains the mark and the name
      lede -> buttons  2.618  reading ends, acting begins
 
-   Two steps, where there were three. The mark used to be two rows — monogram
-   over wordmark — and carried a 1.000 step of its own; one image is one row,
-   so the scale starts at 1.618 now.
+   Three steps, where there were two. The name is the wordmark the mark used
+   to carry as a drawn monogram over a wordmark, back as type, and it keeps the
+   1.000 step it had then: it is part of the lockup, not a separate block of
+   the page.
 
-   One variable drives both, so the whole stack retunes from a single number
-   and the ratios survive. */
+   One variable drives all three, so the whole stack retunes from a single
+   number and the ratios survive.
+
+   Neither boundary at the name is the nominal value, and both differences are
+   font metrics rather than spacing. The name's box carries 0.5em of slack under
+   its own baseline — the tracking cell, which lives inside the box — and its
+   line-height of 1 leaves a further 0.13em above the cap tops. It is the same
+   bargain the consulting eyebrow makes, and the same reason: neither term is
+   worth correcting. */
 .hero__brand {
   --rhythm: clamp(0.75rem, 1.4vw, 1.25rem);
   display: flex;
@@ -248,8 +264,10 @@ body.landing .hero--brand {
 
 /* The landing's hero mark: the smiley artwork, sized off the container.
 
-   30rem is 480px, which at the file's 2.17:1 is 221px tall — reading as a
-   single object rather than a badge sitting on a line of type.
+   28rem is 448px, which at the file's 2.17:1 is 206px tall — reading as a
+   single object rather than a badge sitting on a line of type. It was 30rem
+   until the name below went up in size; the two are one decision, since the
+   name is a proportion of this box.
 
    The filter is the other half. .hero__mark img puts a flame-red drop shadow on
    every hero mark on the site; the artwork does not want it. It is already a
@@ -257,18 +275,89 @@ body.landing .hero--brand {
    yellow ball on a warm gold ground has nothing left to misregister against —
    the flame was the one hot note, and the ground is now a second one.
 
-   MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
+MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
    source order is the only thing clearing the filter. Move this above it and the
-   red offset silently returns. */
+   red offset silently returns.
+
+   Column flex so .hero__name is a flex item rather than an inline box. Two
+   things depend on it: its margin-top opens the gap to the artwork, which a
+   vertical margin on an inline box would not do, and align-items centres it by
+   its margin box, which is what makes the -0.5em over there safe.
+
+   container-type is what ties the name's size to this box instead of to the
+   viewport. The box has three widths — 28rem here, 24rem and 20rem on the short
+   windows at the foot of this file, and the viewport's own width below those —
+   and only the first two are knowable from the viewport alone. Sizing the name
+   off vw, as it started, put 27.4px of type inside the 20rem box under a 600px
+   window: 361px of run in a 320px box, wrapped onto two lines. Measure it again
+   before making it a vw clamp. */
 .hero__mark--art {
-  max-width: 30rem;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  container-type: inline-size;
 }
 
 .hero__mark--art img {
   filter: none;
 }
 
-   would otherwise stack on top of the rhythm. */
+/* The name, set in type under the smiley. This is the landing's answer to the
+   eyebrow the consulting hero carries above its page name: same tracking, same
+   trailing cancel, different face and a different position in the lockup.
+
+   The numbers are measured off the two font files rather than assumed — the
+   hmtx table, every glyph in the run:
+
+     JetBrains Mono   advance 0.600em   12 glyphs = 7.200em
+     Modern DOS 8x16  advance 0.500em   12 glyphs = 6.000em   (consulting)
+
+   letter-spacing adds its value after every glyph, the last one included, so
+   the box is 7.2 + 12(0.5) = 13.2em. margin-right cancels that last cell, and
+   what is left is 12.7em with the ink filling nearly all of it: 373.0px of ink
+   in a 390.3px box at the cap, 0.11px off the mark's centre.
+
+   The 0.5em is consulting's number, kept so the two sites set the brand line
+   identically at every size. Its reasoning does not travel, though. On their
+   bitmap face a 0.5em advance makes 0.5em of tracking exactly one character
+   cell, which is also why the glyph columns stay on the pixel grid; JetBrains
+   Mono advances 0.6em, so the same value is five sixths of a cell. The word
+   space survives either way — it is a blank cell of its own, so between words
+   there are 1.6em of cell against 0.5em between letters.
+
+   The line cannot wrap, and the container query is what guarantees it: 6.6cqw
+   puts the box at 87.1% of the mark at every width measured — 320x568 through
+   2560x1440, and at all three of the mark's width caps — which leaves an eighth
+   of the box for a fallback font or a rounding error. Much past this and it
+   stops being a lockup: at 95% the ink would run 90% of the artwork's width,
+   and the outer rings are already the widest thing on the page.
+
+   6.6cqw lands the ink at 373px under 448px of artwork at the 28rem cap, 83%
+   of it. The absolute sizes that come out — 29.6px at the cap, 18.5px at 280px
+   — sit either side of consulting's 14 to 28px kicker range, 1.6px above it at
+   the top. That is the change rather than an accident: their eyebrow is a label
+   over a 160px wordmark, this is the wordmark's own lockup under 448px of
+   artwork, and it should not be sized like a label.
+
+   The weight is the h1's own 800 rather than consulting's 400: theirs is a
+   bitmap face at kicker size where weight adds nothing legible, this one is
+   JetBrains Mono, where 800 is visibly heavier and is what the lockup needs to
+   hold the same ground the artwork does. */
+.hero__name {
+  margin: calc(var(--rhythm) * 1) 0 0;
+  margin-right: -0.5em;
+  font-family: var(--font-display);
+  font-size: 6.6cqw;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.5em;
+  color: var(--color-text-strong);
+}
+
+/* Lede to buttons: the step below, and an override of the base .hero__cta's
+   flat 32px, which would otherwise stack on top of the rhythm instead of
+   stepping with it. */
 .hero--brand .hero__cta {
   margin-top: calc(var(--rhythm) * 2.618);
 }
@@ -290,8 +379,8 @@ body.landing .hero--brand {
    rather than let the column overflow. Scoped to the landing, which is the
    only page here and has to fit the window rather than scroll.
 
-   820px, not the 700px the gap rule below uses. At the 30rem cap the artwork
-   is 221px tall, so the column clears a 768px-tall laptop with room to spare
+   820px, not the 700px the query below uses. At the 28rem cap the artwork
+   is 206px tall, so the column clears a 768px-tall laptop with room to spare
    and this query is insurance rather than a live constraint. Measure before
    trusting it: if nothing clips, delete it rather than leave a clamp tuned to
    a two-row lockup that no longer exists. */
@@ -299,9 +388,38 @@ body.landing .hero--brand {
   body.landing .hero__mark { max-width: 24rem; }
 }
 
-/* Left at 700px deliberately. This one is not scoped to the landing, so
-   widening it would retune the brand-hero rhythm on window heights that were
-   never the problem. */
+/* Short windows, second pass. The name is a fourth row, and this is the regime
+   the first pass above does not reach: below 700px the column was inside the
+   window at HEAD and outside it with the name in place, by 75px at 1366x600.
+
+   The gap this query used to raise is most of that. A flat
+   clamp(1rem, 2.5vw, 1.5rem) between every pair of rows lands on top of the
+   margins under it, so the stack was carrying a modular scale and an even gap
+   at once — 24px between rows already 19 to 50px apart. Three rows made that
+   twice; four make it three times. It is 0 now, which is what the base rule
+   already says.
+
+   What is left is one variable, because --rhythm drives all three steps: the
+   scale itself comes down a step to 15px at most, which at 1366 is 21px of the
+   column and on a 360px phone nothing at all, since the clamp is already on its
+   12px floor there. The ratios survive, which is the point of driving it.
+
+   Two more give what is left, both measured at 1366x600 and 320x568:
+   the mark from 24rem to 20rem is 29px of artwork at this file's 2.17:1, and
+   .langs drops its 12px to the email, where the email's own 0.5rem of padding
+   still keeps the two apart.
+
+   The result fits at 1366x600, with 30px of slack left. At 360x640 and
+   320x568 it still scrolls, as HEAD did, by 23px and 94px of column — 10px of
+   each is the footer's last gap, which is worth more than 10px of scroll on a
+   screen that already scrolls. Those two want the buttons side by side or a
+   shorter lede, not a smaller smiley. Nothing that fitted at HEAD does not fit
+   now, which is the bar this query has to clear. */
 @media (max-height: 700px) {
-  .hero__brand { gap: clamp(1rem, 2.5vw, 1.5rem); }
+  .hero__brand {
+    --rhythm: min(clamp(0.75rem, 1.4vw, 1.25rem), 0.9375rem);
+    gap: 0;
+  }
+  .langs { margin-bottom: 0; }
+  body.landing .hero__mark { max-width: 20rem; }
 }

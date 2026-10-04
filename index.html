@@ -47,13 +47,20 @@
     <section class="hero hero--brand">
         <div class="container hero__brand">
             <h1 class="hero__mark hero__mark--art">
-                <!-- The name has no artwork of its own to show any more, so it is
-                     carried as text. The smiley is decoration, marked as such
-                     rather than described as the site's name. -->
-                <span class="sr-only">True Friends</span>
+                <!-- The smiley carries no name of its own, so the name is set as
+                     type underneath it and this h1 takes its name from that text.
+                     The artwork is decoration, marked as such rather than
+                     described as the site's name.
+
+                     Typed out in caps rather than set with text-transform, because
+                     the caps are what a screen reader has to work from and not all
+                     of them apply the transform. Untranslated, as on the
+                     consulting hero's eyebrow: a proper noun reads the same in
+                     both languages. -->
                 <img src="img/tf-smiley-chrome-transparent.webp"
                      alt="" aria-hidden="true"
                      width="1200" height="553" decoding="async">
+                <span class="hero__name">TRUE FRIENDS</span>
             </h1>
 
             <p class="hero__lede" data-i18n="hero.lede">A creative and technical studio &amp; consulting firm based in Motala, Sweden, but available worldwide.</p>
