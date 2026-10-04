@@ -3,11 +3,12 @@
  *
  *   node tools/check-css.js
  *
- * Three checks fail the run, one is advisory:
+ * Four checks fail the run, one is advisory:
  *
  *   DEAD   a class rule exists that index.html never puts on an element
  *   TOKEN  a custom property is declared that no rule reads
- *   HUE    --gradient-hero carries a chromatic colour
+ *   HUE    --gradient-hero carries a chromatic #hex, rgb() or hsl() stop
+ *   LINK   a stylesheet index.html loads that is not one of the four
  *   WARN   a class in index.html that no rule matches (may be inline-styled)
  *
  * Only the root index.html is scanned, and that is the whole justification: it
@@ -23,12 +24,13 @@
  * a sweep that deletes one rule too many passes every check in this repo.
  *
  * Note what is stripped before scanning, and why each strip is load-bearing.
- * Comments carry path-like text — `css/base.css`, `img/`, and the `g` unit in
- * `linear-gradient(...)` — and url("...hero.webp") carries a dot followed by a
- * word. Left in, the count is 102 rather than 97: the comments alone
- * contribute `css`, `js` and `g`, and the url()s contribute `webp` and `svg`.
- * Neither kind can produce a bare number, because the class pattern requires
- * a letter or underscore first — `.5` and the `4.66:1` in a comment are safe.
+ * Comments carry path-like text — `css/base.css`, `img/`, and the `e.g.` in
+ * the prose comments in layout.css — and url("...hero.webp") carries a dot
+ * followed by a word. Left in, the count is 102 rather than 97: the comments
+ * alone contribute `css`, `js` and `g`, and the url()s contribute `webp` and
+ * `svg`. Neither kind can produce a bare number, because the class pattern
+ * requires a letter or underscore first — `.5` and the `4.66:1` in a comment
+ * are safe.
  *
  * One known blind spot, stated rather than hidden: DEAD reads class
  * attributes out of index.html and does not read js/main.js, so a class that
@@ -44,68 +46,117 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const SHEETS = ['tokens.css', 'base.css', 'components.css', 'layout.css'];
-const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8');
+const read = p => {
+  const full = path.join(ROOT, p);
+  if (!fs.existsSync(full)) {
+    console.error('check-css: cannot read ' + p);
+    process.exit(1);
+  }
+  return fs.readFileSync(full, 'utf8');
+};
 
-const strip = s =>
+const stripCss = s =>
   s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/url\((['"]?)[^)]*\1\)/g, 'url()');
+const stripHtml = s => s.replace(/<!--[\s\S]*?-->/g, '');
 
-/* ---- classes: rule -> element, and element -> rule ---- */
+/* ---- classes: rule -> element, and element -> rule ----
+   index.html gets the HTML stripper: a commented-out block would otherwise
+   keep a dead rule alive silently. None of its five comments is one today. */
 const inHtml = new Set();
-for (const m of strip(read('index.html')).matchAll(/class="([^"]*)"/g)) {
+for (const m of stripHtml(read('index.html')).matchAll(/class="([^"]*)"/g)) {
   for (const c of m[1].split(/\s+/)) if (c) inHtml.add(c);
 }
 
 const declared = new Map();
 for (const f of SHEETS) {
-  for (const m of strip(read(path.join('css', f))).matchAll(/\.([A-Za-z_][\w-]*)/g)) {
-    if (!declared.has(m[1])) declared.set(m[1], f);
+  for (const m of stripCss(read(path.join('css', f))).matchAll(/\.([A-Za-z_][\w-]*)/g)) {
+    if (!declared.has(m[1])) declared.set(m[1], new Set());
+    declared.get(m[1]).add(f);
   }
 }
 
-const dead = [...declared.keys()].filter(c => !inHtml.has(c)).sort();
+/* A dead rule names the sheets carrying it, because the sweep deletes per
+   file: dropping one copy of a two-sheet rule is not dropping the rule. */
+const dead = [...declared.keys()]
+  .filter(c => !inHtml.has(c))
+  .sort()
+  .map(c => `${c} (${[...declared.get(c)].join(', ')})`);
 const unstyled = [...inHtml].filter(c => !declared.has(c)).sort();
 
 /* ---- tokens: declared -> read ---- */
 const tokenSrc = read(path.join('css', 'tokens.css'));
 const tokens = [...new Set([...tokenSrc.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(m => m[1]))];
 const consumers = SHEETS.map(f => read(path.join('css', f))).join('\n');
-const unused = tokens.filter(t => !consumers.includes('var(' + t + ')')).sort();
+/* Matches both var(--x) and var(--x, fallback). The comma-or-paren is what
+   makes the prefix case safe too: var(--color-bg-hover) does not match
+   var(--color-bg). */
+const isRead = t => new RegExp('var\\(\\s*' + t + '\\s*[,)]').test(consumers);
+const unused = tokens.filter(t => !isRead(t)).sort();
 
 /* ---- the hero gradient must carry no hue ----
    Scoped to this one declaration on purpose. The page is not colourless and
    should not be: --color-accent is brand yellow and sets the CTA buttons. The
-   requirement is that the layer *behind* the photograph is a greyscale ramp. */
+   requirement is that the layer *behind* the photograph is a greyscale ramp.
+   It reads #hex in 3, 4, 6 and 8 digit form, rgb()/rgba() and hsl()/hsla(),
+   and nothing else — not oklch(), not color-mix(), not named colours. Enough,
+   because this declaration is ours to write and uses those three. */
 const chromatic = [];
-const grad = tokenSrc.match(/--gradient-hero:\s*([\s\S]*?);/);
+/* Matched against the STRIPPED source, not the raw one. Stripping the captured
+   value afterwards is too late: the non-greedy capture stops at the first `;`,
+   which for a value holding url("…;…") is inside the url, and every stop after
+   it goes unseen — a fully chromatic gradient reporting HUE 0. */
+const grad = stripCss(tokenSrc).match(/--gradient-hero:\s*([\s\S]*?);/);
 if (!grad) {
   chromatic.push('--gradient-hero is not declared at all');
 } else {
+  /* Already stripped, same as the sheets above: a comment inside the
+     declaration is not a colour stop, and url() is not a colour either. */
+  const stops = grad[1];
   const test = (r, g, b, at) => {
     if (r !== g || g !== b) chromatic.push(`${at} -> rgb(${r}, ${g}, ${b})`);
   };
-  for (const m of grad[1].matchAll(/#([0-9a-f]{3,8})\b/gi)) {
+  for (const m of stops.matchAll(/#([0-9a-f]{3,8})\b/gi)) {
     let h = m[1];
     if (h.length === 3 || h.length === 4) h = [...h.slice(0, 3)].map(c => c + c).join('');
     if (h.length < 6) continue;
     test(parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16), '#' + m[1]);
   }
-  for (const m of grad[1].matchAll(/rgba?\(([^)]*)\)/gi)) {
-    const p = m[1].split(/[,/]/).map(s => s.trim()).filter(Boolean);
+  for (const m of stops.matchAll(/rgba?\(([^)]*)\)/gi)) {
+    const p = m[1].split(/[\s,/]+/).map(s => s.trim()).filter(Boolean);
     const n = i => Math.round(parseFloat(p[i]) || 0);
     test(n(0), n(1), n(2), `rgba(${p.join(', ')})`);
   }
-  for (const m of grad[1].matchAll(/hsla?\(([^)]*)\)/gi)) {
-    const p = m[1].split(/[,/]/).map(s => s.trim());
+  for (const m of stops.matchAll(/hsla?\(([^)]*)\)/gi)) {
+    const p = m[1].split(/[\s,/]+/).map(s => s.trim());
     if ((parseFloat(p[1]) || 0) > 0) chromatic.push(`hsl(${p.join(', ')})`);
   }
 }
 
+/* ---- the four sheets are the four index.html links ----
+   The header's claim is that index.html is the only page loading these
+   stylesheets. That is only half of it: the sheets also have to BE the ones
+   it links. A fifth stylesheet added to the markup and used consistently
+   would otherwise be invisible here, and its dead rules uncounted. */
+const linked = [...stripHtml(read('index.html'))
+  .matchAll(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g)]
+  .map(m => m[1])
+  /* Same-tree only: index.html also links Google Fonts, which carries no
+     rule of ours and so cannot make a class dead. */
+  .filter(h => !/^(?:[a-z]+:)?\/\//.test(h))
+  .map(h => path.basename(h));
+const linkMismatch = [];
+for (const f of SHEETS) {
+  if (!linked.includes(f)) linkMismatch.push(`${f} is styled but not linked from index.html`);
+}
+for (const f of linked) {
+  if (!SHEETS.includes(f)) linkMismatch.push(`index.html links ${f}, which is not scanned`);
+}
+
 /* ---- report ----
    A section header is followed immediately by its items, with no blank line
-   between them. That is deliberate: the blank line goes ABOVE the header, so
+   between them, and the blank line goes ABOVE the header — so
    `sed -n '/^DEAD$/,/^HUE$/p'` captures a whole section. Leading the section
-   with a blank line instead makes that range stop on the first line and
-   silently print a header and nothing else. */
+   instead makes that range stop on the first line and print a bare header. */
 const count = (label, arr) => console.log('  ' + label.padEnd(26) + arr.length);
 const section = (label, arr) => {
   if (!arr.length) return;
@@ -119,11 +170,13 @@ count('DEAD  rule, no element', dead);
 count('TOKEN declared, no reader', unused);
 count('HUE   chromatic gradient', chromatic);
 count('WARN  unstyled (advisory)', unstyled);
+count('LINK  stylesheet not scanned', linkMismatch);
 section('DEAD', dead);
 section('TOKEN', unused);
 section('HUE', chromatic);
 section('WARN', unstyled);
+section('LINK', linkMismatch);
 
-const failures = dead.length + unused.length + chromatic.length;
+const failures = dead.length + unused.length + chromatic.length + linkMismatch.length;
 console.log(`\n${failures} problem(s)`);
 process.exit(failures ? 1 : 0);
