@@ -86,19 +86,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-accent-ink);
 }
 
-/* Typography utilities */
-.lede {
-  font-family: var(--font-body);
-  font-size: 24px;
-  line-height: var(--lh-snug);
-  color: var(--color-text-strong);
-  font-weight: 700;
-}
-
-.accent {
-  color: var(--color-accent);
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -130,19 +117,6 @@ h1, h2, h3, h4, h5, h6 {
   clip: auto;
   background: var(--color-bg);
   color: var(--color-text-strong);
-}
-
-/* Visually-hidden honeypot field for bot detection.
-   Real users can't see or focus it. Bots fill it; submission is silently dropped. */
-.honeypot {
-  position: absolute;
-  left: -9999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
 }
 
 /* The icon sprite: every <use href="#icon-…"> on the page points into this
