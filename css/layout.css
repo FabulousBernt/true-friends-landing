@@ -213,8 +213,26 @@ body.landing > .hero__scrim {
   pointer-events: none;
 }
 
+/* Chrome liquid metal: black ground, blown-out white specular highlights.
+   Unlike the gold marble this replaced, it cannot run at full strength — a
+   third of its pixels are bright enough to swallow body text. Measured, as a
+   floor before the scrim above it darkens things further:
+
+     opacity  worst cream  pixels under 4.5:1
+       1.00      1.01:1          33.2%
+       0.60      2.57:1           5.7%
+       0.50      3.53:1           0.6%
+       0.40      4.98:1           0.0%
+
+   0.4 is the first value that is clean everywhere, and the texture still
+   reads at it — mean luminance 0.0259 against --color-bg's own 0.0030, so it
+   sits nearly nine times above the ground. Raise it to 0.5 for more punch and
+   accept that a fraction of a percent of specular highlights sit under 4.5:1
+   before the scrim is counted.
+
+   The 60% fade below still holds the bottom edge down under the email row. */
 body.landing > .hero__photo {
-  opacity: 0.5;
+  opacity: 0.4;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
           mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
 }
