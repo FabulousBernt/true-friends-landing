@@ -162,7 +162,22 @@
 }
 
 .site-footer__copyright {
-  margin-top: 0.35rem;
+  /* 1rem, not the 0.35rem this carried: the gap below the socials measured 8px
+     against 20px to the email above it and 24px between those two, so the last
+     row of the page was set at half the spacing of the rows above it and read
+     as an afterthought rather than a footer. At 1rem the gap measures 18.4px,
+     which is the same order as its neighbours.
+
+     It measures 2.4px more than the margin because .socials-row is an
+     inline-flex box, so the line box it sits on carries the footer's strut
+     descent below its baseline. That is the 8px the old rule was really
+     delivering, not 5.6px, and worth knowing before anyone trims this to match
+     the number in the declaration.
+
+     Spendable: 41px of slack at 1366x600, the tightest window that still fits,
+     so this costs a tenth of it. At 360x640 and 320x568 it is 10px onto a
+     column that already overflows — see the note at the foot of layout.css. */
+  margin-top: 1rem;
   font-family: var(--font-display);
   font-size: var(--fs-caption);
   color: var(--color-text-subtle);
