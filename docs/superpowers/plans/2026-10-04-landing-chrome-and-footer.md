@@ -91,7 +91,7 @@ The whole plan, in one table. Each task's final step asserts its own row.
 | 0 — baseline, before Task 1 | 97 | 0 | 3 | 1 | **100** |
 | 2 — gradient | 97 | 0 | 0 | 1 | **97** |
 | 3 — markup | 108 | 0 | 0 | 4 | **108** |
-| 4 — components nav CSS | 86 | 0 | 0 | 1 | **86** |
+| 4 — components nav CSS | 87 | 3 | 0 | 0 | **90** |
 | 5 — components pre-split CSS | 57 | 0 | 0 | 1 | **57** |
 | 6 — base.css | 54 | 0 | 0 | 1 | **54** |
 | 7 — layout.css | 0 | 16 | 0 | 1 | **16** |
@@ -747,14 +747,20 @@ EOF
 
 ### Task 4: Delete the nav CSS
 
-Twenty-two class rules go: ten that were already dead, and twelve that Task 3
-turned dead — the twelve the nav carried, not the nine an earlier draft counted.
-DEAD falls 108 → 86.
+Twenty-one class rules go: ten that were already dead, and eleven of the twelve
+Task 3 turned dead. The twenty-second is `.nav` itself, which does **not** leave
+the dead set here — `layout.css:246-247` still carries
+`body:has(.hero--brand) .nav, body:has(.hero--blog) .nav`, the frosted-glass nav
+treatment, and Task 7 deletes it. DEAD therefore falls 108 → 87, not to 86.
 
-WARN falls 4 → 1 in the same commit, because Step 3's rename gives `.langs`,
-`.langs__btn` and `.langs__divider` the rules they need. Do not split this task:
-between the markup rename and this one, the footer switcher renders as a default
-button with no active-language highlight.
+TOKEN rises 0 → 3. Deleting the nav removes the last reader of three tokens:
+`--color-nav-fg`, `--color-nav-fg-hover` and `--color-surface-hover`. They are
+pruned in Task 8; the count is the tool correctly reporting work still to do.
+
+WARN falls 3 → 0, because Step 3's rename gives `.langs`, `.langs__btn` and
+`.langs__divider` the rules they need and `tf-svg-sprite` already has one. Do
+not split this task: between the markup rename and this one, the footer switcher
+renders as a default button with no active-language highlight.
 
 **Files:**
 - Modify: `css/components.css:150-458` (delete all but three renamed rules), `css/components.css:439-440` (delete)
@@ -766,7 +772,7 @@ cd /Users/johnnyvigersten/repos/true-friends-landing
 grep -o '^\.nav__[a-z-]*\|^\.nav \|^\.icon-bar' css/components.css | sort -u | tr '\n' ' '; echo
 ```
 
-Expected, 19 names: `.nav .nav__brand .nav__brand-logo .nav__brand-logo--hover
+Expected, 19 names (`.nav` itself is not among the selectors removed here — see the header): `.nav .nav__brand .nav__brand-logo .nav__brand-logo--hover
 .nav__crumb-current .nav__crumb-link .nav__crumb-sep .nav__crumbs .nav__drawer
 .nav__era .nav__era-tail .nav__inner .nav__lang .nav__lang-divider .nav__langs
 .nav__langs--drawer .nav__link .nav__links .nav__right .nav__socials .nav__toggle`
@@ -891,8 +897,20 @@ node tools/check-css.js 2>&1 | grep -E 'DEAD|TOKEN|HUE|problem'
 
 Expected: `0` nav references. Then the `.langs` rules present, `langs__btn`
 twice more than `.langs` once (the container plus both buttons). `brace depth at
-EOF: 0 | stray closers: 0`, `exit=0`. Then `DEAD 86`, `TOKEN 0`, `HUE 0`,
-`86 problem(s)`.
+EOF: 0 | stray closers: 0`, `exit=0`. Then:
+
+```
+  DEAD  rule, no element    87
+  TOKEN declared, no reader 3
+  HUE   chromatic gradient  0
+  WARN  unstyled (advisory) 0
+  LINK  sheet scan mismatch 0
+
+90 problem(s)
+```
+
+The three TOKEN entries are `--color-nav-fg`, `--color-nav-fg-hover` and
+`--color-surface-hover`. Task 8's.
 
 The brace check is the one that matters most here. Deleting half a rule in a
 846-line file takes the footer with it, and nothing else in the repo parses CSS.
@@ -904,14 +922,19 @@ git add css/components.css
 git commit -m "$(cat <<'EOF'
 Delete the nav CSS and move the switcher rules to the footer
 
-Twenty-two class rules, all of it unreachable from index.html — the only page
-that loads this file. Ten were already dead before this change; the other
-twelve died with the nav markup, which carried twelve distinct classes.
+Twenty-one class rules, all of it unreachable from index.html — the only page
+that loads this file. Ten were already dead before this change; eleven more died
+with the nav markup. The twelfth, `.nav` itself, stays dead until Task 7 removes
+the frosted-glass rule layout.css still carries for it.
 
 The three language rules are kept rather than deleted, renamed off the nav
 namespace to .langs / .langs__btn / .langs__divider. Two colours change
 because the tokens they used are nav-only: --color-nav-fg becomes
 --color-text-strong and hover moves to --color-accent, matching .social.
+
+TOKEN also moves off zero: deleting the nav took the last reader of
+--color-nav-fg, --color-nav-fg-hover and --color-surface-hover, which Task 8
+prunes.
 
 1996/ is untouched. What goes here is a link style for a button that is no
 longer in the markup, not a directory.
