@@ -137,13 +137,28 @@ if (!grad) {
    stylesheets. That is only half of it: the sheets also have to BE the ones
    it links. A fifth stylesheet added to the markup and used consistently
    would otherwise be invisible here, and its dead rules uncounted. */
-const linked = [...stripHtml(read('index.html'))
-  .matchAll(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g)]
-  .map(m => m[1])
-  /* Same-tree only: index.html also links Google Fonts, which carries no
-     rule of ours and so cannot make a class dead. */
-  .filter(h => !/^(?:[a-z]+:)?\/\//.test(h))
-  .map(h => path.basename(h));
+/* rel and href are pulled out of each tag independently. HTML attribute order
+   carries no meaning, and neither does quote style, so a matcher that assumes
+   rel-then-href and double quotes reports a false LINK mismatch the first time
+   anyone tidies the markup — and index.html's <head> is edited by this change.
+   A cache-busting query is dropped for the same reason: css/tokens.css?v=2 is
+   the same sheet. */
+const attr = (tag, name) => {
+  /* The i flag because HTML attribute names are case-insensitive: REL= and
+     HREF= are the same attributes as rel= and href=. */
+  const m = tag.match(new RegExp('\\b' + name + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))', 'i'));
+  return m ? m[1] || m[2] || m[3] : null;
+};
+const linked = [];
+for (const m of stripHtml(read('index.html')).matchAll(/<link\b[^>]*>/g)) {
+  const rel = attr(m[0], 'rel');
+  const href = attr(m[0], 'href');
+  /* Same-tree only: index.html also links Google Fonts, which carries no rule
+     of ours and so cannot make a class dead. */
+  if (!rel || !href || /^(?:[a-z]+:)?\/\//.test(href)) continue;
+  if (!rel.split(/\s+/).includes('stylesheet')) continue;
+  linked.push(path.basename(href.split('?')[0]));
+}
 const linkMismatch = [];
 for (const f of SHEETS) {
   if (!linked.includes(f)) linkMismatch.push(`${f} is styled but not linked from index.html`);
@@ -154,9 +169,17 @@ for (const f of linked) {
 
 /* ---- report ----
    A section header is followed immediately by its items, with no blank line
-   between them, and the blank line goes ABOVE the header — so
-   `sed -n '/^DEAD$/,/^HUE$/p'` captures a whole section. Leading the section
-   instead makes that range stop on the first line and print a bare header. */
+   between them, and the blank line goes ABOVE the header. Two consequences,
+   both learned the hard way:
+     - A range keyed to the next header captures a whole section. Leading the
+       section with a blank line instead makes `sed -n '/^DEAD/,/^$/p'` stop on
+       that line and print a bare header.
+     - But a header is only printed when its section is non-empty, so a sed
+       range terminated by the next header runs on to EOF once that section
+       empties. Extract with awk instead, which returns nothing when the
+       header is absent:
+         awk '/^DEAD$/{f=1;next} /^[A-Z]+$/{f=0} f && /^  /' report.txt
+       Or just read the summary counts, which are printed unconditionally. */
 const count = (label, arr) => console.log('  ' + label.padEnd(26) + arr.length);
 const section = (label, arr) => {
   if (!arr.length) return;
@@ -170,7 +193,7 @@ count('DEAD  rule, no element', dead);
 count('TOKEN declared, no reader', unused);
 count('HUE   chromatic gradient', chromatic);
 count('WARN  unstyled (advisory)', unstyled);
-count('LINK  sheet not scanned', linkMismatch);
+count('LINK  sheet scan mismatch', linkMismatch);
 section('DEAD', dead);
 section('TOKEN', unused);
 section('HUE', chromatic);

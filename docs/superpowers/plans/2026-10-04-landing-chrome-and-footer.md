@@ -244,10 +244,17 @@ if (!grad) {
 
 /* ---- report ----
    A section header is followed immediately by its items, with no blank line
-   between them. That is deliberate: the blank line goes ABOVE the header, so
-   `sed -n '/^DEAD$/,/^HUE$/p'` captures a whole section. Leading the section
-   with a blank line instead makes that range stop on the first line and
-   silently print a header and nothing else. */
+   between them, and the blank line goes ABOVE the header. Two consequences,
+   both learned the hard way:
+     - A range keyed to the next header captures a whole section. Leading the
+       section with a blank line instead makes `sed -n '/^DEAD/,/^$/p'` stop on
+       that line and print a bare header.
+     - But a header is only printed when its section is non-empty, so a sed
+       range terminated by the next header runs on to EOF once that section
+       empties. Extract with awk instead, which returns nothing when the
+       header is absent:
+         awk '/^DEAD$/{f=1;next} /^[A-Z]+$/{f=0} f && /^  /' report.txt
+       Or just read the summary counts, which are printed unconditionally. */
 const count = (label, arr) => console.log('  ' + label.padEnd(26) + arr.length);
 const section = (label, arr) => {
   if (!arr.length) return;
@@ -276,17 +283,19 @@ process.exit(failures ? 1 : 0);
 ```sh
 chmod +x tools/check-css.js
 node tools/check-css.js > /tmp/cc.txt 2>&1; echo "exit=$?"
-grep -E 'DEAD|TOKEN|HUE|WARN|LINK|problem' /tmp/cc.txt
+sed -n '3,11p' /tmp/cc.txt
 ```
 
 Expected: `exit=1`, and the summary block reads
 
 ```
-  DEAD  rule, no element     97
-  TOKEN declared, no reader  0
-  HUE   chromatic gradient   3
-  WARN  unstyled (advisory)  1
-  LINK  sheet not scanned    0
+  34 classes in markup, 130 class rules, 39 tokens
+
+  DEAD  rule, no element    97
+  TOKEN declared, no reader 0
+  HUE   chromatic gradient  3
+  WARN  unstyled (advisory) 1
+  LINK  sheet scan mismatch 0
 
 100 problem(s)
 ```
@@ -1822,31 +1831,24 @@ node tools/check-links.js . | tail -2
 
 Expected: `1`, `1`, all five files listed, and `0 broken`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Add the new tool to README.md's "Checking your work"**
 
-- [ ] **Step 6: Add the new tool to README.md's "Checking your work"**
+`README.md` lists the commands to run before committing. `check-css.js` belongs
+there, and this is the only place it gets scheduled — a tool nobody is told to
+run is a tool that quietly stops matching the site.
 
-`README.md` lists the two commands to run before committing. `check-css.js`
-belongs there, and this is the only place it gets scheduled — a tool nobody is
-told to run is a tool that quietly stops matching the site.
+Append this line to the existing fenced shell block in that section:
 
-Add it to the existing block, keeping the list's shape:
+    node tools/check-css.js
 
-```markdown
-```sh
-./tools/check-stubs.sh
-node tools/check-links.js .
-node tools/i18n.js check
-node tools/check-css.js
-```
+Then, as a new paragraph beneath the block:
 
-`check-css.js` is the one that knows whether the stylesheets still describe this
-page: it fails on a class rule `index.html` never uses and on a custom property
-nothing reads. It is the only check that would have noticed the sweep deleting
-one rule too many.
-```
+> `check-css.js` is the one that knows whether the stylesheets still describe
+> this page: it fails on a class rule `index.html` never uses and on a custom
+> property nothing reads. It is the only check that would have noticed the
+> sweep deleting one rule too many.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```sh
 git add README.md brand/README.md
