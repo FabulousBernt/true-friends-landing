@@ -601,7 +601,7 @@ The email row is unchanged; everything below it is new:
 </a>
 
 <footer class="site-footer">
-    <div class="socials-row" aria-label="Social links" data-i18n-aria-label="aria.socialLinks">
+    <div class="socials-row" role="group" aria-label="Social links" data-i18n-aria-label="aria.socialLinks">
         <a class="social" data-href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" aria-disabled="true">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-linkedin"/></svg>
         </a>
@@ -622,6 +622,12 @@ The email row is unchanged; everything below it is new:
     <p class="site-footer__copyright" data-i18n="footer.copyright">&copy; True Friends 2026</p>
 </footer>
 ```
+
+`role="group"` on the socials row is load-bearing, not decoration. ARIA 1.2
+prohibits naming the `generic` role, so `aria-label` on a role-less `<div>` is
+dropped by Chrome's accessibility tree — which means the localized group name
+written by `data-i18n-aria-label` would never reach a screen reader. `.langs`
+already has `role="group"` for the same reason.
 
 The three `<a class="social">` elements are moved verbatim from the nav,
 `aria-label` and `aria-disabled` intact. That attribute pair is the placeholder

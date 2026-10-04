@@ -111,6 +111,27 @@ h1, h2, h3, h4, h5, h6 {
   border: 0;
 }
 
+/* The skip link is the first focusable thing on the page now that the nav is
+   gone, so it has to become visible when it takes focus. At rest it is a 1x1px
+   clipped box: present in the accessibility tree, invisible on screen. The
+   global :focus-visible outline does not rescue it, because that outline is
+   drawn on the clipped box -- so a sighted keyboard user tabs straight past a
+   bypass mechanism they cannot see, which is the case WCAG 2.4.7 is about.
+
+   Stays absolutely positioned so revealing it does not reflow the hero when it
+   appears, and needs no z-index: the hero backdrop layers sit at -2 and -1, so
+   an auto-z positioned element paints above them. */
+.sr-only:focus {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  overflow: visible;
+  clip: auto;
+  background: var(--color-bg);
+  color: var(--color-text-strong);
+}
+
 /* Visually-hidden honeypot field for bot detection.
    Real users can't see or focus it. Bots fill it; submission is silently dropped. */
 .honeypot {
