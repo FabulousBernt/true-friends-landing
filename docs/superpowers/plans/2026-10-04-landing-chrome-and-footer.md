@@ -1066,8 +1066,24 @@ nothing to trap.
 - [ ] **Step 2: Delete `.lede` and `.accent`**
 
 Remove both rules and the `/* Typography utilities */` banner above them.
-`.sr-only` sits between `.accent` and `.honeypot` and stays — the hero's
-`<span class="sr-only">True Friends</span>` and the skip link both use it.
+
+**Two rules were added to this file during Tasks 3 and 4, sitting between
+`.sr-only` and `.honeypot`. Both must survive, and this is the step whose
+instinct will be to delete anything in that gap.**
+
+`.sr-only:focus` is the skip link's visible-on-focus treatment. Without it the
+bypass mechanism is in the accessibility tree but not on screen, and the global
+`:focus-visible` outline does not help because it is drawn on the clipped 1px
+box — WCAG 2.4.7. Task 3 added it because removing the nav made the skip link
+the page's first focusable element.
+
+`.tf-svg-sprite` replaces an inline `style` attribute that this page's own CSP
+was refusing: `style-src 'self' https://fonts.googleapis.com` carries no
+`'unsafe-inline'`, and no stylesheet was behind it. Do not move those three
+declarations back into the markup.
+
+`.sr-only` itself also stays — the hero's `<span class="sr-only">True Friends</span>`
+and the skip link both use it.
 
 - [ ] **Step 3: Delete `.honeypot` and its comment**
 
