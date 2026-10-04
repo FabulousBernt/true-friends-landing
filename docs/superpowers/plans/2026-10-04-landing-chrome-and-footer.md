@@ -26,9 +26,11 @@ deleting a rule that turned out to be load-bearing — is invisible to
 selector exists.
 
 **Intermediate commits are expected to fail `check-css.js`.** The DEAD count
-*rises* at Task 3, because deleting the nav markup turns nine currently-live
+*rises* at Task 3, because deleting the nav markup turns twelve currently-live
 classes into rules with nothing matching them, and only falls as Tasks 4-7 catch
-up. TOKEN count rises at Task 7 and falls at Task 8. That is the tool reporting
+up. WARN rises too, from 1 to 4, because the footer's three `.langs*` classes
+have no rule until Task 4 renames the old ones — advisory, so it does not fail
+the run, which is why it is worth stating here. TOKEN count rises at Task 7 and falls at Task 8. That is the tool reporting
 honestly about a half-finished sweep, not a regression. Each task states its
 expected count so the two can be told apart.
 
@@ -88,7 +90,7 @@ The whole plan, in one table. Each task's final step asserts its own row.
 |---|---|---|---|---|---|
 | 0 — baseline, before Task 1 | 97 | 0 | 3 | 1 | **100** |
 | 2 — gradient | 97 | 0 | 0 | 1 | **97** |
-| 3 — markup | 105 | 0 | 0 | 1 | **105** |
+| 3 — markup | 108 | 0 | 0 | 4 | **108** |
 | 4 — components nav CSS | 86 | 0 | 0 | 1 | **86** |
 | 5 — components pre-split CSS | 57 | 0 | 0 | 1 | **57** |
 | 6 — base.css | 54 | 0 | 0 | 1 | **54** |
@@ -509,10 +511,24 @@ EOF
 
 ### Task 3: The markup — favicon, no nav, footer regrouped
 
-The DEAD count rises at the end of this task, from 97 to 105. Nine classes stop
-being used the moment the nav markup goes, and `.socials-row` starts being used,
-which is 97 − 1 + 9. That is the checker reporting a half-finished sweep. Tasks
-4-7 bring it down.
+The DEAD count rises at the end of this task, from 97 to 108, and WARN rises from
+1 to 4. Both are correct and neither is a regression.
+
+The nav carried **twelve** distinct classes, not the nine an earlier draft of this
+plan counted: `nav`, `nav__inner`, `nav__brand`, `nav__brand-logo`,
+`nav__brand-logo--hover`, `nav__right`, `nav__socials`, `nav__era`,
+`nav__era-tail`, and — the three that were missed — `nav__langs`, `nav__lang`,
+`nav__lang-divider`. Step 4 renames those last three to `.langs`, `.langs__btn`
+and `.langs__divider`, so the old names lose their element too. Meanwhile
+`socials-row` gains its first consumer. Hence 97 + 12 − 1 = 108.
+
+WARN rises because the three new `.langs*` names have no rule yet; the real rules
+still sit under the old names at `css/components.css:308-340`. **Task 4 must
+therefore land the rename in its own commit** or the switcher ships unstyled for
+a commit. WARN is advisory, so this does not fail the run — which is exactly why
+it is worth stating rather than relying on the exit code.
+
+Tasks 4-7 bring DEAD back down to zero.
 
 **Files:**
 - Modify: `index.html:14` (favicon), `index.html:47-82` (nav and `id="top"`), `index.html:130-136` (footer)
@@ -660,16 +676,31 @@ Expected: `footer open/close: 1 1`, `order socials < langs < copyright: true`,
 - [ ] **Step 7: Check the CSS checker now reports the half-finished sweep**
 
 ```sh
-node tools/check-css.js 2>&1 | grep -E 'DEAD|TOKEN|HUE|problem'
+node tools/check-css.js > /tmp/cc.txt 2>&1; echo "exit=$?"
+sed -n '5,11p' /tmp/cc.txt
 node tools/check-links.js . | tail -2
 node tools/i18n.js check | tail -2
 ```
 
-Expected: `DEAD  rule, no element  105`, `TOKEN 0`, `HUE 0`, `105 problem(s)`.
-Both other tools clean — `0 broken`, and `clean — 20 pages`. The link count drops
-by four from the 985 baseline: `href="#top"` and `href="1996/index.html"` are
-gone, as are the nav brand's two logo `href`s. `img/favicon.png` replaces
-`img/tf-pc-favicon.svg` one-for-one.
+`exit=1` is correct. Expected summary:
+
+```
+  DEAD  rule, no element    108
+  TOKEN declared, no reader 0
+  HUE   chromatic gradient  0
+  WARN  unstyled (advisory) 4
+  LINK  sheet scan mismatch 0
+
+108 problem(s)
+```
+
+WARN 4 is `langs`, `langs__btn`, `langs__divider` and `tf-svg-sprite`. The
+first three are Task 4's to fix.
+
+Both other tools clean — `981 references checked, 0 broken`, and
+`clean — 20 pages`. The link count drops by four from the 985 baseline:
+`href="#top"` and `href="1996/index.html"` are gone, as are the nav brand's two
+logo `href`s. `img/favicon.png` replaces `img/tf-pc-favicon.svg` one-for-one.
 
 - [ ] **Step 8: Commit**
 
@@ -701,7 +732,7 @@ Also swaps the favicon to img/favicon.png, which until this commit was on
 disk but not in git — check-links.js tests fs.existsSync, not membership, so
 it had been passing on a file that would not have deployed.
 
-  node tools/check-css.js    # DEAD 97 -> 105, expected mid-sweep
+  node tools/check-css.js    # DEAD 97 -> 108, WARN 1 -> 4, expected mid-sweep
 EOF
 )"
 ```
@@ -710,8 +741,14 @@ EOF
 
 ### Task 4: Delete the nav CSS
 
-Nineteen class rules go: ten that were already dead, and nine that Task 3 turned
-dead. DEAD falls 105 → 86.
+Twenty-two class rules go: ten that were already dead, and twelve that Task 3
+turned dead — the twelve the nav carried, not the nine an earlier draft counted.
+DEAD falls 108 → 86.
+
+WARN falls 4 → 1 in the same commit, because Step 3's rename gives `.langs`,
+`.langs__btn` and `.langs__divider` the rules they need. Do not split this task:
+between the markup rename and this one, the footer switcher renders as a default
+button with no active-language highlight.
 
 **Files:**
 - Modify: `css/components.css:150-458` (delete all but three renamed rules), `css/components.css:439-440` (delete)
@@ -861,9 +898,9 @@ git add css/components.css
 git commit -m "$(cat <<'EOF'
 Delete the nav CSS and move the switcher rules to the footer
 
-Nineteen class rules, all of it unreachable from index.html — the only page
+Twenty-two class rules, all of it unreachable from index.html — the only page
 that loads this file. Ten were already dead before this change; the other
-nine died with the nav markup.
+twelve died with the nav markup, which carried twelve distinct classes.
 
 The three language rules are kept rather than deleted, renamed off the nav
 namespace to .langs / .langs__btn / .langs__divider. Two colours change
