@@ -1451,7 +1451,7 @@ cd /Users/johnnyvigersten/repos/true-friends-landing
 node tools/check-css.js 2>&1 | sed -n '/^TOKEN/,/^$/p'
 ```
 
-Expected, exactly sixteen names:
+Expected, exactly sixteen names (this is what the tool actually reports, not a prediction):
 
 ```
 --blur-glass
