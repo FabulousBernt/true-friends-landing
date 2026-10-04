@@ -94,7 +94,7 @@ The whole plan, in one table. Each task's final step asserts its own row.
 | 4 — components nav CSS | 87 | 3 | 0 | 0 | **90** |
 | 5 — components pre-split CSS | 59 | 6 | 0 | 0 | **65** |
 | 6 — base.css | 56 | 6 | 0 | 0 | **62** |
-| 7 — layout.css | 0 | 19 | 0 | 0 | **19** |
+| 7 — layout.css | 0 | 16 | 0 | 0 | **16** |
 | 8 — token prune | 0 | 0 | 0 | 0 | **0** |
 
 Two corrections to an earlier draft of this table, both found by running the
@@ -112,7 +112,7 @@ is what surfaced this.
 **Token climbs monotonically from Task 4 to Task 7, then drops to zero in one
 step.** Deleting rules is what orphans a token, so every deletion task adds to
 the count and only Task 8 — which deletes the tokens themselves — clears it:
-0 → 3 at Task 4, → 6 at Task 5, → 19 at Task 7. Every row carries the count
+0 → 3 at Task 4, → 6 at Task 5, → 16 at Task 7. Every row carries the count
 forward rather than resetting it, which is the whole point of publishing the
 table.
 
