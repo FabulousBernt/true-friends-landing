@@ -183,25 +183,37 @@ blocking `js/lang-boot.js` both stay as they are.
 | Now | Becomes |
 |---|---|
 | `radial-gradient(ellipse 80% 60% at 70% 65%, rgba(255, 140, 60, 0.35), transparent 70%)` | `radial-gradient(ellipse 80% 60% at 70% 65%, rgba(255, 255, 255, 0.07), transparent 70%)` |
-| `radial-gradient(ellipse 70% 50% at 20% 30%, rgba(20, 25, 50, 0.85), transparent 70%)` | `radial-gradient(ellipse 70% 50% at 20% 30%, rgba(255, 255, 255, 0.04), transparent 70%)` |
+| `radial-gradient(ellipse 70% 50% at 20% 30%, rgba(20, 25, 50, 0.85), transparent 70%)` | `radial-gradient(ellipse 70% 50% at 20% 30%, rgba(0, 0, 0, 0.85), transparent 70%)` |
 | `linear-gradient(180deg, #0a0a0a 0%, #1a1208 55%, #0a0a0a 100%)` | `linear-gradient(180deg, #0a0a0a 0%, #141414 55%, #0a0a0a 100%)` |
 
 Orange out, warm-black `#1a1208` out. Nothing coloured is left on the page.
 
-**The radials go near-black rather than white, and this is the one judgement in
-the change worth arguing for.** `layout.css:216-233` records a measurement:
-`opacity: 0.4` is the first strength at which the chrome texture puts **no
-pixel at all** under 4.5:1 against the cream text, so the failing-pixel budget
-there is zero rather than merely thin. The `0.6%` in that table belongs to
-`opacity: 0.50`, and it is the price of *raising* it, which the comment there
-offers as a trade. A white radial behind a photo already carrying blown-out
-white speculars spends that zero. Near-white at 7% and 4% keeps the tonal
-separation between the two glows while adding no hue and almost no luminance.
+**The two radials keep pushing in opposite directions, and that is the one
+judgement in the change worth arguing for.** The lower-right glow lightens; the
+upper-left one darkens. Translating both to white — the obvious reading of
+"black and white" — flips the upper left from a weight to a haze, which is a
+different picture rather than a desaturated one. So the upper-left becomes
+`rgba(0, 0, 0, 0.85)`, near-black over a near-black ground, where it reads as
+held down rather than drawn.
+
+**On the alphas.** `layout.css:216-233` records a measurement taken as a floor
+before the scrim above it darkens further: `opacity: 0.4` puts 0.0% of the
+texture's pixels under 4.5:1 against the cream text. (The `0.6%` in that table
+belongs to `opacity: 0.50`, and is the price of *raising* it.) A one-decimal
+0.0% is not a hard zero — it bounds the failing set below 0.05%. Converting the
+worst-case ratio gives the number that matters: at 4.98:1 the brightest
+permissible pixel is sRGB 108, and the 4.5:1 line is 115, so the real headroom
+is about **7/255**. The lower-right glow's 7% white is attenuated twice before
+it reaches text — once by the photo's `opacity: 0.4`, once by the scrim — which
+is what lets it fit inside that. Substitution does not make it worse: measured
+against the cream text, the worst pixel goes from 7.1:1 with the old orange to
+9.9:1 with the new white.
 
 **It is a fallback layer, and barely visible.** `.hero__photo` sits above it at
-`opacity: 0.4` and masks out below 60% of the viewport height
-(`layout.css:234-238`). The gradient only reads in the bottom 40%, which is
-where the change from `#1a1208` to `#141414` actually shows.
+`opacity: 0.4`, holding full opacity to 60% of the viewport height and
+ramping to nothing over the last 40% (`layout.css:234-238`). So the gradient
+reads everywhere but shows most in that bottom 40%, which is where the change
+from `#1a1208` to `#141414` actually lands.
 
 ### The image above it is already greyscale
 

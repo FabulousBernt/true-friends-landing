@@ -422,23 +422,33 @@ Expected, three lines of colour between two `transparent` stops:
 Replace the whole `--gradient-hero` declaration, comment included, with:
 
 ```css
-  /* Greyscale ramp behind the hero photo. The shape is unchanged from the
-     version that carried colour — same three layers, same geometry — because
-     the photo masks out below 60% of the viewport and this layer is what
-     keeps that bottom from reading as a hard edge.
+  /* Greyscale ramp behind the hero photo. Same three layers and the same
+     geometry as the version that carried colour: this layer is what keeps the
+     bottom of the page from reading as a hard edge where the photo's mask
+     runs out. The photo above holds full opacity to 60% of the viewport and
+     ramps to nothing over the last 40%, so that edge is where this shows.
 
-     The radials are near-black rather than white on purpose. Opacity .4 is the
-     first strength at which the chrome texture above puts no pixel at all under
-     4.5:1 against the cream text, so the failing-pixel budget there is zero,
-     not merely thin (see the measurement in layout.css). A white glow behind a
-     photo that already carries blown-out white speculars spends that zero. 7%
-     and 4% white keep the separation between the two glows and add no hue.
+     The two radials still push in opposite directions, which is the part worth
+     keeping. The lower-right one lightens; the upper-left one DARKENS, at
+     near-black over a near-black ground so it reads as held down rather than
+     drawn. Making both of them white would flip that corner from a weight to a
+     haze, which is a different picture rather than a desaturated one.
+
+     Alphas are low because this layer sits under a photograph whose speculars
+     are already near white. The measurement in layout.css is a floor taken
+     before the scrim above it, and it puts .4 at 0.0% of pixels under 4.5:1
+     against the cream text — which works out to about 7/255 of headroom
+     between the brightest texture pixel and the 4.5:1 line. The glow is
+     attenuated twice before it reaches text, by the photo's opacity and then
+     by the scrim, and that headroom is what it has to fit inside.
 
      The photograph is greyscale to begin with — widest channel spread across
-     all 2560x1440 of it is 1/255 — so this was the only colour on the page. */
+     all 2560x1440 of it is 1/255 — so this declaration was the only colour in
+     the hero backdrop. The brand yellow and flame red elsewhere on the page
+     are untouched. */
   --gradient-hero:
     radial-gradient(ellipse 80% 60% at 70% 65%, rgba(255, 255, 255, 0.07), transparent 70%),
-    radial-gradient(ellipse 70% 50% at 20% 30%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 20% 30%, rgba(0, 0, 0, 0.85), transparent 70%),
     linear-gradient(180deg, #0a0a0a 0%, #141414 55%, #0a0a0a 100%);
 ```
 
@@ -463,16 +473,27 @@ git commit -m "$(cat <<'EOF'
 Strip the colour out of the hero gradient
 
 --gradient-hero was an orange glow over a navy wash over a warm black, and
-it was the only colour on the page: the hero photograph measures a widest
-channel spread of 1/255 across all 2560x1440 of it, so anything tinted came
-from this declaration.
+it was the only colour in the hero backdrop: the hero photograph measures a
+widest channel spread of 1/255 across all 2560x1440 of it, so anything tinted
+came from this declaration. The brand yellow and flame red elsewhere on the
+page are untouched.
 
 Shape is unchanged — same three layers, same geometry — because the photo
-masks out below 60% of the viewport and this is what stops that bottom edge
-reading as a hard line. The radials go near-black rather than white: the
-texture above already sits at zero pixels under 4.5:1 at opacity .4 -- that
-opacity is the first with a clean sweep -- so a white glow behind blown-out
-white speculars spends a budget that is already at zero.
+holds full opacity to 60% of the viewport and ramps out over the last 40%,
+and this is what stops that bottom edge reading as a hard line. The two
+radials keep pushing in opposite directions — lightening at lower right,
+darkening at upper left. Making both white, the obvious reading of "black
+and white", flips that corner from a weight to a haze: a different picture
+rather than a desaturated one. So the upper left becomes near-black over a
+near-black ground, where it reads as held down rather than drawn.
+
+Alphas stay low because this layer sits under a photograph whose speculars are
+already near white, and the measurement layout.css records is a floor taken
+before the scrim above it. At .4 the brightest permissible pixel is sRGB 108 and
+the 4.5:1 line is 115, so there is about 7/255 of headroom to fit inside. The
+glow is attenuated twice before it reaches text, by the photo's opacity and then
+by the scrim -- and substitution does not make it worse: worst-case contrast
+against the cream text goes from 7.1:1 with the old orange to 9.9:1 with white.
 
   node tools/check-css.js    # HUE 3 -> 0
 EOF
