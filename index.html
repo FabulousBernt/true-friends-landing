@@ -11,7 +11,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="index,follow">
 
-    <link rel="icon" type="image/svg+xml" href="img/tf-pc-favicon.svg">
+    <link rel="icon" type="image/png" href="img/favicon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,42 +44,8 @@
 
 <a href="#main" class="sr-only" data-i18n="aria.skip">Skip to content</a>
 
-<header class="nav" id="site-nav" data-open="false">
-    <div class="nav__inner">
-        <a href="#top" class="nav__brand" aria-label="True Friends home" data-i18n-aria-label="aria.home">
-            <img class="nav__brand-logo" src="img/tf-pc-logo-transparent.svg" alt=""
-                 width="1955" height="1491" decoding="async">
-            <img class="nav__brand-logo nav__brand-logo--hover" src="img/tf-pc-logo-yellow-transparent.svg" alt=""
-                 width="1955" height="1491" decoding="async" aria-hidden="true">
-        </a>
-
-        <div class="nav__right">
-            <a class="nav__era" href="1996/index.html"><span data-i18n="era.classic">TF 1996</span> <span class="nav__era-tail" data-i18n="era.classicTail">website</span></a>
-
-            <div class="nav__socials" aria-label="Social links" data-i18n-aria-label="aria.socialLinks">
-                <a class="social" data-href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" aria-disabled="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-linkedin"/></svg>
-                </a>
-                <a class="social" data-href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" aria-disabled="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-instagram"/></svg>
-                </a>
-                <a class="social" data-href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" aria-disabled="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-youtube"/></svg>
-                </a>
-            </div>
-
-
-            <div class="nav__langs" role="group" aria-label="Switch language" data-i18n-aria-label="aria.langSwitch">
-                <button type="button" class="nav__lang" data-lang="en" aria-pressed="true">EN</button>
-                <span class="nav__lang-divider" aria-hidden="true">/</span>
-                <button type="button" class="nav__lang" data-lang="sv" aria-pressed="false">SV</button>
-            </div>
-        </div>
-    </div>
-</header>
-
 <main id="main">
-    <section class="hero hero--brand" id="top">
+    <section class="hero hero--brand">
         <div class="container hero__brand">
             <h1 class="hero__mark hero__mark--art">
                 <!-- The name has no artwork of its own to show any more, so it is
@@ -132,6 +98,24 @@
 </a>
 
 <footer class="site-footer">
+    <div class="socials-row" aria-label="Social links" data-i18n-aria-label="aria.socialLinks">
+        <a class="social" data-href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-linkedin"/></svg>
+        </a>
+        <a class="social" data-href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-instagram"/></svg>
+        </a>
+        <a class="social" data-href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-youtube"/></svg>
+        </a>
+    </div>
+
+    <div class="langs" role="group" aria-label="Switch language" data-i18n-aria-label="aria.langSwitch">
+        <button type="button" class="langs__btn" data-lang="en" aria-pressed="true">EN</button>
+        <span class="langs__divider" aria-hidden="true">/</span>
+        <button type="button" class="langs__btn" data-lang="sv" aria-pressed="false">SV</button>
+    </div>
+
     <p class="site-footer__copyright" data-i18n="footer.copyright">&copy; True Friends 2026</p>
 </footer>
 
