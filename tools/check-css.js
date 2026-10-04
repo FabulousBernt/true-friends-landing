@@ -124,7 +124,7 @@ if (!grad) {
   for (const m of stops.matchAll(/rgba?\(([^)]*)\)/gi)) {
     const p = m[1].split(/[\s,/]+/).map(s => s.trim()).filter(Boolean);
     const n = i => Math.round(parseFloat(p[i]) || 0);
-    test(n(0), n(1), n(2), `rgba(${p.join(', ')})`);
+    test(n(0), n(1), n(2), `${m[0].slice(0, m[0].indexOf('('))}(${p.join(', ')})`);
   }
   for (const m of stops.matchAll(/hsla?\(([^)]*)\)/gi)) {
     const p = m[1].split(/[\s,/]+/).map(s => s.trim());
@@ -170,7 +170,7 @@ count('DEAD  rule, no element', dead);
 count('TOKEN declared, no reader', unused);
 count('HUE   chromatic gradient', chromatic);
 count('WARN  unstyled (advisory)', unstyled);
-count('LINK  stylesheet not scanned', linkMismatch);
+count('LINK  sheet not scanned', linkMismatch);
 section('DEAD', dead);
 section('TOKEN', unused);
 section('HUE', chromatic);

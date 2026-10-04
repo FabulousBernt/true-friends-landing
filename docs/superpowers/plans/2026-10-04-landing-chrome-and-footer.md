@@ -276,13 +276,25 @@ process.exit(failures ? 1 : 0);
 ```sh
 chmod +x tools/check-css.js
 node tools/check-css.js > /tmp/cc.txt 2>&1; echo "exit=$?"
-grep -E 'DEAD|TOKEN|HUE|WARN|problem' /tmp/cc.txt | head -6
-sed -n '/^DEAD/,/^$/p' /tmp/cc.txt | grep -c '^  '
+grep -E 'DEAD|TOKEN|HUE|WARN|LINK|problem' /tmp/cc.txt
 ```
 
-Expected: `exit=1`, then `97`. The summary block reads `DEAD  rule, no element  97`,
-`TOKEN declared, no reader  0`, `HUE   chromatic gradient  3`,
-`WARN  unstyled (advisory)  1`, and `100 problem(s)`.
+Expected: `exit=1`, and the summary block reads
+
+```
+  DEAD  rule, no element     97
+  TOKEN declared, no reader  0
+  HUE   chromatic gradient   3
+  WARN  unstyled (advisory)  1
+  LINK  sheet not scanned    0
+
+100 problem(s)
+```
+
+**Assert on the summary, not on the item lists.** The per-section lists are only
+printed when non-empty, so any `sed` range keyed to a section header runs on to
+EOF the moment that section empties — and Task 2 empties HUE. The summary counts
+are printed unconditionally and are what every later task should quote.
 
 **This failure is the point.** It is the measurement that says 97 rules in this
 repository match nothing, and it is what Tasks 3-8 drive to zero.
@@ -290,8 +302,12 @@ repository match nothing, and it is what Tasks 3-8 drive to zero.
 - [ ] **Step 4: Confirm it sees the three real chromatic colours and not more**
 
 ```sh
-sed -n '/^HUE/,/^$/p' /tmp/cc.txt
+awk '/^HUE$/{f=1;next} /^[A-Z]+$/{f=0} f && /^  /' /tmp/cc.txt
 ```
+
+The `awk` terminates on the next section header rather than on a blank line, so
+it still returns the right three lines after Task 2 empties HUE — at which point
+there is no `HUE` header at all and it correctly prints nothing.
 
 Expected: exactly three lines —
 `#1a1208 -> rgb(26, 18, 8)`, `rgba(255, 140, 60, 0.35) -> rgb(255, 140, 60)`
@@ -301,7 +317,7 @@ and `rgba(20, 25, 50, 0.85) -> rgb(20, 25, 50)`. The two `#0a0a0a` stops and
 - [ ] **Step 5: Confirm the Warn is the inline-styled sprite and not a gap**
 
 ```sh
-sed -n '/^WARN/,$p' /tmp/cc.txt | head -5
+awk '/^WARN$/{f=1;next} /^[A-Z]+$/{f=0} f && /^  /' /tmp/cc.txt
 grep -c 'tf-svg-sprite' index.html
 ```
 
@@ -319,8 +335,12 @@ const s=require("fs").readFileSync("css/layout.css","utf8");
 console.log("ratio in a comment:", /4\.\d+:1|\.5 opacity/.test(s.replace(/url\([^)]*\)/g,"")) ? "present" : "absent");
 console.log("url() in a rule:", /url\(/.test(s) ? "present" : "absent");
 '
-node tools/check-css.js 2>&1 | grep -E '^  (5|webp|svg)$' || echo "no numeric or filename classes reported"
+node tools/check-css.js 2>&1 | grep -E '^  (5|webp|svg|g|css|js)( |$)' || echo "no numeric, filename or path classes reported"
 ```
+
+A bare `g`, `css` or `js` in the DEAD list means a CSS comment is being read as
+a selector — those three and the two filenames are exactly what the strips
+prevent.
 
 Expected: `present` for both — the file does contain a contrast ratio in a
 comment and a `url()` in a rule — and then `no numeric or filename classes
@@ -1804,6 +1824,30 @@ Expected: `1`, `1`, all five files listed, and `0 broken`.
 
 - [ ] **Step 5: Commit**
 
+- [ ] **Step 6: Add the new tool to README.md's "Checking your work"**
+
+`README.md` lists the two commands to run before committing. `check-css.js`
+belongs there, and this is the only place it gets scheduled — a tool nobody is
+told to run is a tool that quietly stops matching the site.
+
+Add it to the existing block, keeping the list's shape:
+
+```markdown
+```sh
+./tools/check-stubs.sh
+node tools/check-links.js .
+node tools/i18n.js check
+node tools/check-css.js
+```
+
+`check-css.js` is the one that knows whether the stylesheets still describe this
+page: it fails on a class rule `index.html` never uses and on a custom property
+nothing reads. It is the only check that would have noticed the sweep deleting
+one rule too many.
+```
+
+- [ ] **Step 7: Commit**
+
 ```sh
 git add README.md brand/README.md
 git commit -m "$(cat <<'EOF'
@@ -1817,6 +1861,11 @@ brand/README.md lists the favicon among the files to keep in step across the
 three repositories. The landing now uses img/favicon.png, so it joins
 common.js's trim in the "One wrinkle" section that already exists for exactly
 this kind of divergence.
+
+Also adds check-css.js to README.md's "Checking your work", which lists every
+other tool in the repo. It was the one piece of this change with no scheduled
+step, and a checker nobody is told to run is a checker that quietly stops
+matching the site.
 
 Noted there: img/tf-pc-favicon.svg is referenced in ten files under 1996/
 and cannot be deleted when the other two sites move to the PNG.
