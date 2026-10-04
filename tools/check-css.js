@@ -22,9 +22,22 @@
  * check-links.js reads href/src in HTML and has no idea a selector exists, so
  * a sweep that deletes one rule too many passes every check in this repo.
  *
- * Note what is stripped before scanning. Comments carry numbers like 4.66:1
- * and .5 opacity, and url("...hero.webp") carries a dot followed by a word.
- * Left in, both read as class selectors named `5` and `webp`.
+ * Note what is stripped before scanning, and why each strip is load-bearing.
+ * Comments carry path-like text — `css/base.css`, `img/`, and the `g` unit in
+ * `linear-gradient(...)` — and url("...hero.webp") carries a dot followed by a
+ * word. Left in, the count is 102 rather than 97: the comments alone
+ * contribute `css`, `js` and `g`, and the url()s contribute `webp` and `svg`.
+ * Neither kind can produce a bare number, because the class pattern requires
+ * a letter or underscore first — `.5` and the `4.66:1` in a comment are safe.
+ *
+ * One known blind spot, stated rather than hidden: DEAD reads class
+ * attributes out of index.html and does not read js/main.js, so a class that
+ * JavaScript puts on an element at runtime is reported as dead even while the
+ * script still names it. Eight were — gallery__item, gallery__tile,
+ * lightbox__thumb and the rest, all assigned by the gallery and lightbox code
+ * in main.js. That code is itself inert and is being deleted, so the
+ * conclusion holds; but if it is ever revived, this tool will not notice the
+ * stylesheet underneath it going missing. Read DEAD together with main.js.
  */
 const fs = require('fs');
 const path = require('path');
