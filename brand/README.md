@@ -36,6 +36,18 @@ Neither the landing page nor TF Classic reads that key, so both have been
 trimmed. If you copy `common.js` from another repository in future, trim them
 again.
 
+The landing's favicon is a second divergence. It uses `img/favicon.png` where
+the other two still use `img/tf-pc-favicon.svg`. The PNG is the current brand
+artwork; the SVG is kept because TF Classic renders it as a 16px taskbar icon,
+which is not what that file is for. If consulting or studio move to the PNG,
+delete `img/tf-pc-favicon.svg` from the list above — but not before `1996/`
+stops referencing it in ten files.
+
+The landing's copy of `css/*.css`, `js/main.js` and `js/translations/common.js`
+is now trimmed to what one page renders: the contact form, gallery, lightbox,
+nav and back-to-top all went with the September sweep. Copying from a sibling
+repository will bring those back. Trim them again for this one.
+
 ## Two rules worth knowing before you redesign
 
 Everything else about how a site looks is yours to change. These two are not

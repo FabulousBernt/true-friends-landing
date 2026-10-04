@@ -1917,6 +1917,9 @@ Small, and the reason a later reader does not go looking for a navbar.
 **Files:**
 - Modify: `README.md`, `brand/README.md`
 
+`README.md`'s "Checking your work" block also gains the two tools that existed all
+along but were never listed — `i18n.js` and, from Task 1, `check-css.js`.
+
 - [ ] **Step 1: Find the sentences that are now wrong**
 
 ```sh
@@ -1977,16 +1980,18 @@ Expected: `1`, `1`, all five files listed, and `0 broken`.
 there, and this is the only place it gets scheduled — a tool nobody is told to
 run is a tool that quietly stops matching the site.
 
-Append this line to the existing fenced shell block in that section:
+Add both tools to the existing fenced shell block in that section — `i18n.js`
+existed all along and was never listed either:
 
+    node tools/i18n.js check
     node tools/check-css.js
 
 Then, as a new paragraph beneath the block:
 
 > `check-css.js` is the one that knows whether the stylesheets still describe
-> this page: it fails on a class rule `index.html` never uses and on a custom
-> property nothing reads. It is the only check that would have noticed the
-> sweep deleting one rule too many.
+> this page: it fails on a class rule `index.html` never uses, on a custom
+> property nothing reads, and on any colour left in `--gradient-hero`. It is
+> the only check that would have noticed the sweep deleting one rule too many.
 
 - [ ] **Step 6: Commit**
 

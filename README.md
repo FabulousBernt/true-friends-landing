@@ -3,7 +3,9 @@
 `truefriends.se`
 
 The brand umbrella. One page pointing at the two businesses, plus TF Classic and
-the redirect stubs for every URL that existed before the split.
+the redirect stubs for every URL that existed before the split. TF Classic is not
+linked from the landing page — the nav button across to it was removed while its
+future is undecided — but it is still here and still reachable by URL.
 
 A hand-written static site: no build step, no package manager, no framework.
 
@@ -49,10 +51,18 @@ reversible.
 ```sh
 ./tools/check-stubs.sh
 node tools/check-links.js .
+node tools/i18n.js check
+node tools/check-css.js
 ```
 
-The link checker cannot see paths built in JavaScript. That is how the 1996
-gallery was missed once already.
+`check-css.js` is the one that knows whether the stylesheets still describe this
+page: it fails on a class rule `index.html` never uses, on a custom property
+nothing reads, and on any colour left in `--gradient-hero`. It is the only check
+that would have noticed the September sweep deleting one rule too many.
+
+The link checker cannot see paths built in JavaScript, and it does not read CSS
+`url()` at all. That is how the 1996 gallery was missed once already, and why
+the CSS-only references are worth an eyeball in the console.
 
 ## History
 
