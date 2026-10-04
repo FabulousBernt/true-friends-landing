@@ -92,6 +92,15 @@
     </section>
 </main>
 
+<!-- The switcher sits between the hero and the email rather than down in
+     the footer: it reads as chrome for the address below it, and the footer
+     proper is then the socials and the copyright. -->
+<div class="langs" role="group" aria-label="Switch language" data-i18n-aria-label="aria.langSwitch">
+    <button type="button" class="langs__btn" data-lang="en" aria-pressed="true">EN</button>
+    <span class="langs__divider" aria-hidden="true">/</span>
+    <button type="button" class="langs__btn" data-lang="sv" aria-pressed="false">SV</button>
+</div>
+
 <a class="email-row landing-email" href="mailto:hello@truefriends.se">
     <span>hello@truefriends.se</span>
 </a>
@@ -107,12 +116,6 @@
         <a class="social" data-href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" aria-disabled="true">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-youtube"/></svg>
         </a>
-    </div>
-
-    <div class="langs" role="group" aria-label="Switch language" data-i18n-aria-label="aria.langSwitch">
-        <button type="button" class="langs__btn" data-lang="en" aria-pressed="true">EN</button>
-        <span class="langs__divider" aria-hidden="true">/</span>
-        <button type="button" class="langs__btn" data-lang="sv" aria-pressed="false">SV</button>
     </div>
 
     <p class="site-footer__copyright" data-i18n="footer.copyright">&copy; True Friends 2026</p>

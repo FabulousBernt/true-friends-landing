@@ -64,20 +64,33 @@
   margin-left: 0.125rem;
 }
 
-/* Language switcher. It sits in the footer because this page has no nav, and
-   it stays because it is the only route to the Swedish strings: main.js does no
-   locale detection on purpose (see detectLanguageSync), so without these
-   buttons the Swedish dictionary is unreachable rather than merely unfindable.
+/* Language switcher. It sits directly above the email row rather than down
+   in the footer, because it reads as chrome for the address below it and
+   that leaves the footer itself as the socials and the copyright. It stays at
+   all: with the nav gone it is the only route to the Swedish strings, as
+   main.js does no locale detection on purpose (see detectLanguageSync), so
+   without these buttons the Swedish dictionary is unreachable rather than
+   merely unfindable.
 
-   Two colours changed when it moved. --color-nav-fg and --color-nav-fg-hover
-   went with the nav, so the resting colour is --color-text-strong and the hover
-   matches .social's. margin-top opens the gap to the socials row above; base.css
-   sets p { margin: 0 }, so the footer rows carry their own spacing. */
+   Two colours changed when it came out of the nav. --color-nav-fg and
+   --color-nav-fg-hover went with the nav, so the resting colour is
+   --color-text-strong and the hover matches .social's.
+
+   align-self is load-bearing now that this is a child of body rather than of
+   the footer: body.landing is a column flex, and an inline-flex item stretches
+   across the cross axis, which would put EN and SV hard against the left edge.
+   Inside the footer, text-align: center did this job instead.
+
+   No margin-top: the hero's own padding-block is the gap above, 1.5rem to 3rem
+   of it. margin-bottom opens the gap to the email, which carries 0.5rem of
+   padding of its own — 12px between the two boxes, 20px from the EN/SV glyphs
+   to the address. layout.css takes the 12px away again below a 700px window. */
 .langs {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: 0.75rem;
+  align-self: center;
+  margin-bottom: 0.75rem;
 }
 
 .langs__btn {
