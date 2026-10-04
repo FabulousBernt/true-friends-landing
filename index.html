@@ -21,6 +21,9 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/layout.css">
+    <!-- The hero background is a CSS custom property, so nothing in the markup
+         points at it and the browser only finds it after parsing the CSS. -->
+    <link rel="preload" as="image" href="img/landing-hero-bg.webp">
     <!-- Blocking on purpose: decides before first paint whether the
          English markup is about to be translated. See the file. -->
     <script src="js/lang-boot.js"></script>
@@ -78,13 +81,14 @@
 <main id="main">
     <section class="hero hero--brand" id="top">
         <div class="container hero__brand">
-            <h1 class="hero__mark hero__mark--lockup">
-                <img class="hero__mark-monogram" src="img/tf-pc-logo-transparent.svg"
+            <h1 class="hero__mark hero__mark--art">
+                <!-- The name has no artwork of its own to show any more, so it is
+                     carried as text. The smiley is decoration, marked as such
+                     rather than described as the site's name. -->
+                <span class="sr-only">True Friends</span>
+                <img src="img/tf-smiley-chrome-transparent.webp"
                      alt="" aria-hidden="true"
-                     width="1955" height="1491" decoding="async">
-                <img class="hero__mark-wordmark" src="img/tf-archivo-yellow-transparent.svg"
-                     alt="True Friends"
-                     width="3956" height="484" decoding="async">
+                     width="1200" height="553" decoding="async">
             </h1>
 
             <p class="hero__lede" data-i18n="hero.lede">A creative and technical studio &amp; consulting firm based in Motala, Sweden, but available worldwide.</p>

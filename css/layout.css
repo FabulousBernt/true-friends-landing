@@ -195,7 +195,7 @@ body.landing {
   min-height: 100vh;
   min-height: 100svh;
   isolation: isolate;
-  --hero-photo-url: url("../img/landing-page-hero.webp");
+  --hero-photo-url: url("../img/landing-hero-bg.webp");
 }
 body.landing main { flex: 1; display: flex; flex-direction: column; }
 body.landing .hero { flex: 1; align-items: center; }
@@ -804,46 +804,30 @@ body.landing .hero--brand {
     drop-shadow(1px 1px 0 rgba(10, 10, 10, 0.55));
 }
 
-/* The landing lockup: the monogram sits as a badge over the wordmark. The
-   two images need their own widths — .hero__mark img is width: 100%, which
-   would otherwise stretch the near-square monogram to the wordmark's span
-   and stand it 56rem tall. The wordmark keeps the full container; the
-   monogram is capped to a fraction of it.
+/* The landing's hero mark: the smiley artwork, sized off the container the way
+   the wordmark used to be. One image rather than a two-row lockup, so one
+   modifier — --lockup and -monogram only existed because there were two images
+   at different sizes.
 
-   Both share the one --mark-offset from .hero__mark rather than taking a
-   scaled-down value the way the section mark does. The rule there is
-   offset-follows-width, but what the eye actually reads is offset against
-   stroke weight, and the monogram's strokes are roughly as heavy at 7rem as
-   the wordmark's are at 56rem — its glyphs are a fifth the width but drawn
-   at ten times the weight. Same offset, same misregistration. */
-.hero__mark--lockup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--rhythm);
+   30rem is 480px, which at the file's 2.17:1 is 221px tall — close to what the
+   old lockup column took, while reading as a single object rather than a badge
+   sitting on a line of type.
+
+   The filter is the other half. .hero__mark img puts a flame-red drop shadow on
+   every hero mark on the site; the artwork does not want it. It is already a
+   lit, shaded sphere with its own chrome rings, and a red offset behind a
+   yellow ball on a warm gold ground has nothing left to misregister against —
+   the flame was the one hot note, and the ground is now a second one.
+
+   MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
+   source order is the only thing clearing the filter. Move this above it and the
+   red offset silently returns. */
+.hero__mark--art {
+  max-width: 30rem;
 }
 
-/* A percentage of the lockup, not a vw clamp. The wordmark sizes off the
-   container (width: 100%, capped at 56rem) while the old clamp(4rem, 9vw,
-   7rem) sized off the viewport, so the two scaled on different bases and the
-   lockup's proportion drifted from roughly 5:1 to 10:1 as the window
-   resized — it was only ever "right" at one width. Both images now resolve
-   against the same box, so the ratio is fixed everywhere, and the monogram
-   follows .hero__mark down to 40rem on short windows for free rather than
-   needing its own entry in that media query.
-
-   17.45% of a 56rem wordmark is ~156px against the wordmark's 110px cap
-   height — enough for the monogram to read as the senior element in the
-   lockup rather than a tag sitting on top of it. The odd number is the
-   round 18% scaled by 1378.38/1422, the inked fraction of the old box:
-   18% was tuned against artwork that sat flush to its box horizontally,
-   and the Archivo monogram instead carried 1.5% clear space left and
-   right, so cropping that away would have grown the glyph by as much. The crop's
-   real prize is vertical — 9.5% dead space top and bottom, which is what
-   used to inflate the gap below and leave the lockup reading looser than
-   --rhythm sets it. */
-.hero__mark-monogram {
-  max-width: 17.45%;
+.hero__mark--art img {
+  filter: none;
 }
 
 /* Consulting and studio: the page name IS the hero. It used to sit under a
@@ -928,7 +912,7 @@ body.landing .hero--brand {
    clear it. The wordmark takes the monogram down with it, so one cap still
    does the whole job. */
 @media (max-height: 820px) {
-  body.landing .hero__mark { max-width: 40rem; }
+  body.landing .hero__mark { max-width: 24rem; }
 }
 
 /* Left at 700px deliberately. This one is not scoped to the landing, so
