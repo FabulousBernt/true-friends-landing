@@ -189,12 +189,13 @@ blocking `js/lang-boot.js` both stay as they are.
 Orange out, warm-black `#1a1208` out. Nothing coloured is left on the page.
 
 **The radials go near-black rather than white, and this is the one judgement in
-the change worth arguing for.** `layout.css:216-233` records a measurement: at
-`opacity: 0.4` the chrome texture already puts 0.6% of its pixels under 4.5:1
-against the cream text, and 0.4 is the first opacity that is clean everywhere. A
-white radial behind a photo that already carries blown-out white speculars
-raises its luminance in exactly the region the measurement is about, and undoes
-work that was done deliberately. Near-white at 7% and 4% keeps the tonal
+the change worth arguing for.** `layout.css:216-233` records a measurement:
+`opacity: 0.4` is the first strength at which the chrome texture puts **no
+pixel at all** under 4.5:1 against the cream text, so the failing-pixel budget
+there is zero rather than merely thin. The `0.6%` in that table belongs to
+`opacity: 0.50`, and it is the price of *raising* it, which the comment there
+offers as a trade. A white radial behind a photo already carrying blown-out
+white speculars spends that zero. Near-white at 7% and 4% keeps the tonal
 separation between the two glows while adding no hue and almost no luminance.
 
 **It is a fallback layer, and barely visible.** `.hero__photo` sits above it at

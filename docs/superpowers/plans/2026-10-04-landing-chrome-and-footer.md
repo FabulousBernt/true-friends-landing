@@ -427,13 +427,12 @@ Replace the whole `--gradient-hero` declaration, comment included, with:
      the photo masks out below 60% of the viewport and this layer is what
      keeps that bottom from reading as a hard edge.
 
-     The radials are near-black rather than white on purpose. The chrome
-     texture above already puts 0.6% of its pixels under 4.5:1 against the
-     cream text at opacity .4, the first opacity that is clean everywhere
-     (see the measurement in layout.css). A white glow behind a photo that
-     already carries blown-out white speculars would raise luminance in
-     exactly the region that measurement is about. 7% and 4% white keep the
-     separation between the two glows and add no hue.
+     The radials are near-black rather than white on purpose. Opacity .4 is the
+     first strength at which the chrome texture above puts no pixel at all under
+     4.5:1 against the cream text, so the failing-pixel budget there is zero,
+     not merely thin (see the measurement in layout.css). A white glow behind a
+     photo that already carries blown-out white speculars spends that zero. 7%
+     and 4% white keep the separation between the two glows and add no hue.
 
      The photograph is greyscale to begin with — widest channel spread across
      all 2560x1440 of it is 1/255 — so this was the only colour on the page. */
@@ -471,9 +470,9 @@ from this declaration.
 Shape is unchanged — same three layers, same geometry — because the photo
 masks out below 60% of the viewport and this is what stops that bottom edge
 reading as a hard line. The radials go near-black rather than white: the
-texture above already sits at 0.6% of pixels under 4.5:1 at opacity .4, and
-a white glow behind blown-out white speculars would work against the
-measurement layout.css records.
+texture above already sits at zero pixels under 4.5:1 at opacity .4 -- that
+opacity is the first with a clean sweep -- so a white glow behind blown-out
+white speculars spends a budget that is already at zero.
 
   node tools/check-css.js    # HUE 3 -> 0
 EOF
