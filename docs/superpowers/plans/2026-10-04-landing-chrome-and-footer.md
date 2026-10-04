@@ -90,17 +90,30 @@ The whole plan, in one table. Each task's final step asserts its own row.
 |---|---|---|---|---|---|
 | 0 — baseline, before Task 1 | 97 | 0 | 3 | 1 | **100** |
 | 2 — gradient | 97 | 0 | 0 | 1 | **97** |
-| 3 — markup | 108 | 0 | 0 | 4 | **108** |
+| 3 — markup | 108 | 0 | 0 | 3 | **108** |
 | 4 — components nav CSS | 87 | 3 | 0 | 0 | **90** |
-| 5 — components pre-split CSS | 57 | 0 | 0 | 1 | **57** |
-| 6 — base.css | 54 | 0 | 0 | 1 | **54** |
-| 7 — layout.css | 0 | 16 | 0 | 1 | **16** |
-| 8 — token prune | 0 | 0 | 0 | 1 | **0** |
+| 5 — components pre-split CSS | 57 | 3 | 0 | 0 | **60** |
+| 6 — base.css | 54 | 3 | 0 | 0 | **57** |
+| 7 — layout.css | 0 | 19 | 0 | 0 | **19** |
+| 8 — token prune | 0 | 0 | 0 | 0 | **0** |
 
-The Warn count never moves off 1: `tf-svg-sprite` is the one class in the markup
-with no rule, because it is sized by an inline `style` attribute at
-`index.html:34`. That is deliberate and it is why unstyled classes are advisory
-rather than a failure.
+Two corrections to an earlier draft of this table, both found by running the
+tool rather than by arithmetic:
+
+**Warn reaches 0 at Task 4, not 1.** The baseline's single warning was
+`tf-svg-sprite`, which had no rule because it was sized by an inline `style`
+attribute. That attribute was itself a defect — the page's CSP is
+`style-src 'self' https://fonts.googleapis.com` with no `'unsafe-inline'`, so the
+browser was refusing it — and moving those three declarations into `base.css`
+during Task 3 gave the sprite a real rule. Warn is advisory rather than a
+failure precisely so that a class with no rule is visible without blocking; that
+is what surfaced this.
+
+**Token does not return to 0 after Task 4.** Deleting the nav took the last
+reader of three tokens, so the count rises 0 → 3 and stays there until Task 8
+prunes them. Tasks 5-7 delete rules, not tokens, so it climbs again at Task 7 as
+their readers go. Every row from Task 4 on carries it forward rather than
+resetting.
 
 ---
 
