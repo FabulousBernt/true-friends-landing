@@ -145,6 +145,22 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
 }
 
+/* The icon sprite: every <use href="#icon-…"> on the page points into this
+   element's <defs>, so it has to exist but must not render or take up space.
+   These three declarations were an inline style attribute until this rule
+   replaced them, which was a mistake: this page's CSP is
+   `style-src 'self' https://fonts.googleapis.com` with no 'unsafe-inline', so
+   the browser refused the attribute and logged a violation on every load, and
+   no stylesheet was behind it. Left that way the <svg> falls back to the
+   default 300x150 replaced-element box, in flow, as the first flex item of
+   body. */
+.tf-svg-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 /* Held back by js/lang-boot.js while a Swedish visitor's page is still
    English in the markup. `visibility` rather than `display` so layout
    resolves underneath and nothing reflows when it lifts — and the body
