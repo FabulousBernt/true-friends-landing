@@ -1661,7 +1661,7 @@ forms gone nothing calls it. `getNested` and `substitute` **stay** —
 
 ```sh
 node --check js/main.js && echo "syntax ok"
-grep -c 'GALLERY_IMAGES\|sanitizePayload\|RATE_LIMIT_MS\|site-nav\|service-item\|back-to-top\|data-modal-open' js/main.js
+grep -c 'GALLERY_IMAGES\|sanitizePayload\|RATE_LIMIT_MS\|site-nav\|service-item\|back-to-top\|data-modal-open\|data-endpoint' js/main.js
 grep -c 'applyTranslations\|getNested\|substitute\|data-lang\|pageshow\|TF_TRANSLATIONS' js/main.js
 node -e '
 const s = require("fs").readFileSync("js/main.js","utf8");
