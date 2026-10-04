@@ -92,8 +92,8 @@ The whole plan, in one table. Each task's final step asserts its own row.
 | 2 — gradient | 97 | 0 | 0 | 1 | **97** |
 | 3 — markup | 108 | 0 | 0 | 3 | **108** |
 | 4 — components nav CSS | 87 | 3 | 0 | 0 | **90** |
-| 5 — components pre-split CSS | 57 | 3 | 0 | 0 | **60** |
-| 6 — base.css | 54 | 3 | 0 | 0 | **57** |
+| 5 — components pre-split CSS | 59 | 6 | 0 | 0 | **65** |
+| 6 — base.css | 56 | 6 | 0 | 0 | **62** |
 | 7 — layout.css | 0 | 19 | 0 | 0 | **19** |
 | 8 — token prune | 0 | 0 | 0 | 0 | **0** |
 
@@ -109,11 +109,19 @@ during Task 3 gave the sprite a real rule. Warn is advisory rather than a
 failure precisely so that a class with no rule is visible without blocking; that
 is what surfaced this.
 
-**Token does not return to 0 after Task 4.** Deleting the nav took the last
-reader of three tokens, so the count rises 0 → 3 and stays there until Task 8
-prunes them. Tasks 5-7 delete rules, not tokens, so it climbs again at Task 7 as
-their readers go. Every row from Task 4 on carries it forward rather than
-resetting.
+**Token climbs monotonically from Task 4 to Task 7, then drops to zero in one
+step.** Deleting rules is what orphans a token, so every deletion task adds to
+the count and only Task 8 — which deletes the tokens themselves — clears it:
+0 → 3 at Task 4, → 6 at Task 5, → 19 at Task 7. Every row carries the count
+forward rather than resetting it, which is the whole point of publishing the
+table.
+
+**DEAD does not fall by the number of rules a task deletes.** Task 5 removes 28
+dead rules from `components.css`, but `.form__row` and `.gallery__tile` were
+declared in *both* `components.css` and `layout.css`, so deleting one copy
+leaves the class dead until Task 7 removes the other. The count falls by the
+number of classes that became *unreachable everywhere*, which is not the number
+of lines deleted.
 
 ---
 
@@ -1038,11 +1046,23 @@ const c = require("fs").readFileSync("css/components.css","utf8");
 let d = 0, b = 0;
 for (const ch of c) { if (ch === "{") d++; else if (ch === "}") { d--; if (d < 0) b++; } }
 console.log("brace depth:", d, "| stray:", b); process.exit(d===0&&b===0?0:1);'
-node tools/check-css.js 2>&1 | grep -E 'DEAD|problem'
+node tools/check-css.js 2>&1 | grep -E 'DEAD|TOKEN|problem'
+node tools/check-css.js 2>&1 | grep -E '\((components|base)\.css' || echo "  none"
 ```
 
 Expected: `0` for all eight deleted patterns. Then `1` for each of the seven
-survivors. `brace depth: 0 | stray: 0`, `exit=0`. Then `DEAD 57`, `57 problem(s)`.
+survivors. `brace depth: 0 | stray: 0`, `exit=0`.
+
+Then `DEAD 59`, `TOKEN 6`, `59 problem(s)` — no, `65 problem(s)`; and the last
+command prints **nothing**, because no DEAD entry names `components.css` or
+`base.css` any more. That is the real assertion for this task: the file is
+clean. DEAD falls 87 → 59, not by the 28 rules deleted but by the 28 classes
+that became unreachable everywhere — `.form__row` and `.gallery__tile` were
+declared in both this file and `layout.css`, so one deletion does not clear
+them.
+
+TOKEN rises 3 → 6: `--color-border-input`, `--color-border-strong` and `--z-nav`
+lose their last readers here. Task 8 prunes them.
 
 - [ ] **Step 8: Commit**
 
