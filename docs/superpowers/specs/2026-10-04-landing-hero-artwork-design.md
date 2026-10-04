@@ -39,10 +39,21 @@ The texture looks dark in a thumbnail and is not. Sampled across the whole file:
 Relative luminance has to stay under `0.1715` for the cream lede
 (`#faf9f5`) to clear 4.5:1 against it.
 
-| Treatment | Pixels that break 4.5:1 (cream) | (yellow) |
-|---|---|---|
-| Texture at full strength | **24.5%** | 28.5% |
-| Texture at `opacity: .5` over `--color-bg` | **0%** | 3.2% |
+| Treatment | Worst pixel (cream) | Worst pixel (yellow) | Pixels under 4.5:1 (cream) | (yellow) |
+|---|---|---|---|---|
+| Texture at full strength | 1.35:1 | 1.11:1 | **24.5%** | 28.7% |
+| Texture at `opacity: .5` over `--color-bg` | **4.66:1** | 3.83:1 | **0%** | 3.2% |
+
+The second row is a floor, not a measurement of the finished page: the scrim
+and the gradient only ever darken what is under them, so the painted result
+lands at or above those figures. Cream clears 4.5:1 across the whole texture
+before either is applied.
+
+Yellow does not clear 4.5:1 everywhere at that opacity — 3.2% of the texture
+sits under. It is not load-bearing on this page: the only yellow text is
+`--color-nav-fg-hover` on the nav's "TF 1996" link, and the nav's frosted tint
+puts its own 50% dark panel behind that. Re-measure if the accent ever sets
+body copy over the bare texture.
 
 This is why the background is not simply "the image". Untreated, a quarter of
 the texture is too light to carry body text. The treatment already in
@@ -185,7 +196,9 @@ say the scale now starts at 1.618, and why the two surviving steps are untouched
 - Exactly one `<h1>`, reading "True Friends".
 - Re-measure the cream lede against the *composited* background — texture at
   `.5` over ink, plus the scrim — rather than trusting the per-pixel numbers
-  above, which were taken on the raw texture.
+  above, which were taken on the raw texture. `tools/contrast.js`, added by this
+  change, is the thing that does it: it takes an image path and prints the
+  worst-case ratios and failure percentages.
 
 ## Not in scope
 
