@@ -226,17 +226,26 @@ that reads it, and that rule checked against the delete list above — not eyeba
 | `--color-border-subtle` | `.consultant-card` | deleted |
 | `--color-border-strong` | `.field__textarea:hover` | form deleted |
 | `--color-border-input` | `.field__textarea` | form deleted |
+| `--color-border` | `.nav__era`, `body:has(.hero--blog) .nav`, `.section__terminal`, `.section__terminal-chrome`, `.service-list > li + li`, `.consultant-card__portrait` | all six deleted |
+| `--color-text-muted` | `.section__figure-caption`, `.section__note`, `.section__terminal-title`, `.form__status`, `.nav__crumb-current`, `.nav__crumb-link`, `.services__note`, `.lightbox__caption` | all eight deleted |
+| `--color-nav-fg` | `.nav__link`, `.nav__lang`, `.nav .social`, `.nav__era` | nav deleted, and the one survivor (`.langs__btn`) is retargeted below |
+| `--color-nav-fg-hover` | `.nav__crumb-link`, `.nav__link`, `.nav__lang`, `.nav .social` | nav deleted, survivor retargeted |
 | `--fs-small` | `.form__status`, `.services__note`, `.section__figure-caption`, `.section__note` | all deleted |
 | `--nav-height` | `.section` | deleted |
 | `--section-gap` | `.section` | deleted |
 | `--z-nav` | `.nav`, `.back-to-top` | both deleted |
-| `--color-nav-fg` | `.nav__link`, `.nav__lang`, `.nav .social`, `.nav__era` | nav deleted, and the one survivor (`.langs__btn`) is retargeted below |
-| `--color-nav-fg-hover` | `.nav__crumb-link`, `.nav__link`, `.nav__lang`, `.nav .social` | nav deleted, survivor retargeted |
 | `--color-glass-tint` | `.nav`, `.section__terminal` | both deleted |
 | `--color-glass-highlight` | `.section__terminal-chrome`, `.service-line__summary:hover` | both deleted |
 | `--blur-glass` | `.nav`, `.section__terminal` | both deleted |
 
-**The last three are the one to look at.** They back the frosted-glass chrome —
+**Sixteen, and two of them are the reason this list was worth computing rather
+than reading.** `--color-border` and `--color-text-muted` are the kind of token
+that looks obviously still in use — the border colour, the muted text — and both
+turn out to have no reader at all once the pre-split blocks go. A token left
+behind is dead weight; a token deleted while a rule still reads it drops that
+declaration silently, to nothing.
+
+**The glass trio is the one to look at.** They back the frosted-glass chrome —
 `.nav` (`layout.css:246-256`) and `.section__terminal*` — and with both gone,
 **the frosted-glass treatment leaves the site entirely.** It is correct, and it
 is a bigger aesthetic consequence than it sounds, so it is called out here
@@ -249,7 +258,7 @@ Four tokens look like casualties and are **not**, which is why the trace matters
 | `--color-flame` | `.hero__mark img` (`layout.css:821`) still declares the flame filter. `.hero__mark--art img { filter: none }` clears it on the landing, but the rule and the token both stay. |
 | `--color-accent-pressed` | `.btn:active` (`components.css:36`) — `.btn` is one of only three component classes the landing still uses. |
 | `--lh-snug` | `base.css:74` sets it on every heading. Its other two uses (`.lede`, `.service-line__name`) go, but the token does not. |
-| `--tracking-label` | `.btn` (`components.css:22`) still uses it. |
+| `--tracking-label` | `.btn` (`components.css:22`) still uses it. Its other use, `.nav__era`, goes. |
 
 ### `css/components.css`
 
