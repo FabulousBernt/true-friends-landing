@@ -57,11 +57,16 @@
 
      Alphas are low because this layer sits under a photograph whose speculars
      are already near white. The measurement in layout.css is a floor taken
-     before the scrim above it, and it puts .4 at 0.0% of pixels under 4.5:1
-     against the cream text — which works out to about 7/255 of headroom
-     between the brightest texture pixel and the 4.5:1 line. The glow is
-     attenuated twice before it reaches text, by the photo's opacity and then
-     by the scrim, and that headroom is what it has to fit inside.
+     before the scrim above it darkens further, and it puts .4 at 0.0% of
+     pixels under 4.5:1 against the cream text. Inverted, that is about 7/255
+     between the brightest texture pixel and the 4.5:1 line.
+
+     The glow does not fit inside that on its own. At 7% white it adds about
+     17/255 at the ground and 10/255 after the photo's opacity .4 carries most
+     of it upward, against 7/255 of headroom — so the worst pixel still sits
+     under 4.5:1 before the scrim, and the scrim above is what brings it back
+     over the line. That makes body.landing .hero__scrim load-bearing for this
+     gradient. Worth knowing before editing either rule.
 
      The photograph is greyscale to begin with — widest channel spread across
      all 2560x1440 of it is 1/255 — so this declaration was the only colour in

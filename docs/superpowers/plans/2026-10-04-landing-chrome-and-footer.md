@@ -436,11 +436,16 @@ Replace the whole `--gradient-hero` declaration, comment included, with:
 
      Alphas are low because this layer sits under a photograph whose speculars
      are already near white. The measurement in layout.css is a floor taken
-     before the scrim above it, and it puts .4 at 0.0% of pixels under 4.5:1
-     against the cream text — which works out to about 7/255 of headroom
-     between the brightest texture pixel and the 4.5:1 line. The glow is
-     attenuated twice before it reaches text, by the photo's opacity and then
-     by the scrim, and that headroom is what it has to fit inside.
+     before the scrim above it darkens further, and it puts .4 at 0.0% of
+     pixels under 4.5:1 against the cream text. Inverted, that is about 7/255
+     between the brightest texture pixel and the 4.5:1 line.
+
+     The glow does not fit inside that on its own. At 7% white it adds about
+     17/255 at the ground and 10/255 after the photo's opacity .4 carries most
+     of it upward, against 7/255 of headroom — so the worst pixel still sits
+     under 4.5:1 before the scrim, and the scrim above is what brings it back
+     over the line. That makes body.landing .hero__scrim load-bearing for this
+     gradient. Worth knowing before editing either rule.
 
      The photograph is greyscale to begin with — widest channel spread across
      all 2560x1440 of it is 1/255 — so this declaration was the only colour in
@@ -488,12 +493,12 @@ rather than a desaturated one. So the upper left becomes near-black over a
 near-black ground, where it reads as held down rather than drawn.
 
 Alphas stay low because this layer sits under a photograph whose speculars are
-already near white, and the measurement layout.css records is a floor taken
-before the scrim above it. At .4 the brightest permissible pixel is sRGB 108 and
-the 4.5:1 line is 115, so there is about 7/255 of headroom to fit inside. The
-glow is attenuated twice before it reaches text, by the photo's opacity and then
-by the scrim -- and substitution does not make it worse: worst-case contrast
-against the cream text goes from 7.1:1 with the old orange to 9.9:1 with white.
+already near white. At 7% the lower-right glow adds about 17/255 at the ground
+and 10/255 after the photo's opacity, against the 7/255 of headroom the
+contrast measurement leaves -- so the worst pixel is still under 4.5:1 before
+the scrim, and body.landing .hero__scrim is what brings it back over. That
+makes the scrim load-bearing for this gradient, which is the thing to know
+before editing either rule.
 
   node tools/check-css.js    # HUE 3 -> 0
 EOF
@@ -1125,7 +1130,7 @@ body.landing .hero__scrim {
 **This is the scrim that darkens the hero photograph on the landing.** Deleting
 the whole rule instead of the two selector prefixes takes the page's contrast
 treatment with it, and nothing in this repo would notice: the photograph would
-simply render brighter than the measurement in `layout.css:216-233` assumes.
+simply render brighter than the contrast measurement recorded in `layout.css` assumes.
 
 **`layout.css:129-132`.** Delete the whole rule, `.hero--studio .hero__content,
 body.landing .hero__content { gap: clamp(20px, 2.2vw, 32px); }`. Both halves are

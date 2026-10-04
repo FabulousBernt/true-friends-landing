@@ -196,18 +196,26 @@ different picture rather than a desaturated one. So the upper-left becomes
 `rgba(0, 0, 0, 0.85)`, near-black over a near-black ground, where it reads as
 held down rather than drawn.
 
-**On the alphas.** `layout.css:216-233` records a measurement taken as a floor
-before the scrim above it darkens further: `opacity: 0.4` puts 0.0% of the
+**On the alphas.** The measurement `layout.css` records is a floor taken before
+the scrim above it darkens further: `opacity: 0.4` puts 0.0% of the
 texture's pixels under 4.5:1 against the cream text. (The `0.6%` in that table
 belongs to `opacity: 0.50`, and is the price of *raising* it.) A one-decimal
 0.0% is not a hard zero — it bounds the failing set below 0.05%. Converting the
 worst-case ratio gives the number that matters: at 4.98:1 the brightest
 permissible pixel is sRGB 108, and the 4.5:1 line is 115, so the real headroom
-is about **7/255**. The lower-right glow's 7% white is attenuated twice before
-it reaches text — once by the photo's `opacity: 0.4`, once by the scrim — which
-is what lets it fit inside that. Substitution does not make it worse: measured
-against the cream text, the worst pixel goes from 7.1:1 with the old orange to
-9.9:1 with the new white.
+is about **7/255**.
+
+The glow does not fit inside that on its own, and the honest version of the
+argument is the one that says so. At 7% white the lower-right glow adds about
+17/255 at the ground and 10/255 after the photo's `opacity: 0.4` carries most
+of it upward, against 7/255 of headroom — the worst pixel is still under 4.5:1
+*before* the scrim. What restores it is `body.landing .hero__scrim`, which makes
+the scrim load-bearing for this gradient. That matters here because the sweep
+edits the rule that provides it.
+
+Substitution is nonetheless not a regression. The glow that replaced the orange
+is a tenth of its strength, so on any pixel the photo does not cover the new
+gradient is very close to `--color-bg`, where the old one was visibly warm.
 
 **It is a fallback layer, and barely visible.** `.hero__photo` sits above it at
 `opacity: 0.4`, holding full opacity to 60% of the viewport height and
