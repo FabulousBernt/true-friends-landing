@@ -36,13 +36,26 @@
   background-position: center;
 }
 
+/* The hero photograph, which is a video. It occupies the layer the still used to
+   and carries the same mask and the same dimming, so the backdrop's whole
+   treatment below is unchanged and the only thing that differs is that the
+   pixels move.
+
+   object-fit rather than background-size, because a <video> has no background to
+   size. It covers the poster too, which is the attribute that shows before the
+   first frame arrives, so there is no resize or reflow at the handover.
+
+   The autoplay is not in the markup. preload="none" plus main.js, which calls
+   play() only for a reader who has not asked for reduced motion — see the note on
+   data-hero-video there. */
 .hero__photo {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: var(--hero-photo-url, none);
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   opacity: 0.85;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
           mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
@@ -73,13 +86,51 @@ body.landing .hero__scrim {
    about 370px of viewport, where two 150px buttons and the gap no longer fit
    inside the container — the same 40px becomes the gap between them stacked,
    and 24px of a 640px window is a lot to spend on that. row-gap only ever
-   applies once the row has wrapped. */
+   applies once the row has wrapped.
+
+   The wrap is the safety valve for the equal widths set on .btn, and it is the
+   live site's own threshold rather than a new one — see the note on .btn's
+   min-width for what equal widths cost. */
 .hero__cta--row {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
   column-gap: 40px;
   row-gap: 1rem;
+}
+
+/* Below 416px the 40px gap and .btn's 1.25rem padding are what stop two 168px
+   buttons fitting side by side, and the binding constraint is the min-width
+   rather than either of those — a button will not go below its own content no
+   matter how little padding it has. So it is the minimum that comes down, to
+   the tightest value the content actually allows:
+
+     the inline padding, 20px to 12px a side, which puts CONSULTING's 127px of
+       label, gap and mark at needing 151px,
+     the min-width, 10.5em to 9.75em, which is 156px — that 151px plus 5px of
+       slack for the font-metric difference between JetBrains Mono loading and
+       not loading,
+     the gap, 40px to 16px.
+
+   which is 328px of pair needing 328px of column, so it fits down to a 368px
+   window: the live site's own threshold, reached again by a different route.
+   Below that the row wraps, as it always did.
+
+   The buttons are 12px narrower below this breakpoint than above it. That is
+   the trade for not stacking them on every phone, and it is the right way
+   round: 12px of width on a button is invisible, and the alternative was two
+   buttons in two rows at 390px and 375px, which is most of them.
+
+   This lives here rather than beside the min-width in components.css because
+   layout.css loads after it: at equal specificity a media query does not win by
+   matching, it only wins by coming later, and .hero__cta--row above is one
+   selector with no media condition on it to beat. */
+@media (max-width: 26rem) {
+  .hero__cta--row { column-gap: 1rem; }
+  .hero__cta--row .btn {
+    min-width: 9.75em;
+    padding-inline: 0.75rem;
+  }
 }
 
 /* ---------- Landing page layout ---------- */
@@ -99,7 +150,6 @@ body.landing {
   min-height: 100vh;
   min-height: 100svh;
   isolation: isolate;
-  --hero-photo-url: url("../img/landing-hero-bg.webp");
 }
 body.landing main { flex: 1; display: flex; flex-direction: column; }
 body.landing .hero { flex: 1; align-items: center; }
@@ -117,22 +167,33 @@ body.landing > .hero__scrim {
   pointer-events: none;
 }
 
-/* Chrome liquid metal: black ground, blown-out white specular highlights.
-   Unlike the gold marble this replaced, it cannot run at full strength — a
-   third of its pixels are bright enough to swallow body text. Measured, as a
-   floor before the scrim above it darkens things further:
+/* The blue ribbon: a near-black ground with a glowing specular edge, and the
+   reason this layer is dimmed as hard as it is. It cannot run at full strength —
+   the bright edge is bright enough to swallow body text. Measured over twenty
+   frames of the loop, composited over --color-bg and before the scrim above it
+   darkens things further, exactly as the chrome table below was:
 
      opacity  worst cream  pixels under 4.5:1
-       1.00      1.01:1          33.2%
-       0.60      2.57:1           5.7%
-       0.50      3.53:1           0.6%
-       0.40      4.98:1           0.0%
+       1.00         —             —
+       0.60      2.69:1          3.50%
+       0.50      3.61:1          0.66%
+       0.45      4.23:1          0.01%
+       0.40      4.98:1          0.00%
+       0.35      5.88:1          0.00%
+       0.30      6.97:1          0.00%
 
-   0.4 is the first value that is clean everywhere, and the texture still
-   reads at it — mean luminance 0.0259 against --color-bg's own 0.0030, so it
-   sits nearly nine times above the ground. Raise it to 0.5 for more punch and
-   accept that a fraction of a percent of specular highlights sit under 4.5:1
-   before the scrim is counted.
+   0.4 is the value this carries and it is the same one the chrome still used, so
+   the two read as one decision rather than two. It is also, independently, the
+   highest value at which nothing at all in the loop falls under 4.5:1 — the
+   worst pixel lands at 4.98:1, the same figure the chrome table reached at the
+   same opacity.
+
+   It reads fainter than the chrome did at the same number, and that is the
+   footage rather than the setting: mean luminance 0.0155 against the chrome's
+   0.0259, so this one sits five times above the ground where that one sat nine.
+   A blue glow on black carries less of its energy in the midtones than white
+   speculars do. 0.45 is the next step up and costs 0.01% of pixels; take it if
+   the backdrop wants more presence.
 
    The 60% fade below still holds the bottom edge down under the email row. */
 body.landing > .hero__photo {
@@ -201,22 +262,21 @@ body.landing .hero--brand {
   padding-block: clamp(1.5rem, 4vh, 3rem);
 }
 
-/* Vertical rhythm. A single flex gap spaced every row equally, which made
-   the lede look as attached to the button below it as to the mark above —
-   proximity was encoding nothing. The rows are now steps on one modular
-   scale, ratio 1.618, so the spacing states the relationships:
+/* Vertical rhythm. This was a single flex gap, which made the lede look as
+   attached to the button below it as to the mark above — proximity was encoding
+   nothing. It then became three steps on a golden-ratio scale, which fixed the
+   unevenness and introduced a different problem: 1 : 1.618 : 2.618 is a scale,
+   and a scale in the gaps is not the same thing as a gap. Measured as ink, the
+   three came out at 23.4 / 43.3 / 57.0 at 1920x1080 — very nearly 1 : 2 : 2.4.
+   Nobody spaces a lockup on purpose like that, and the eye reads the last one
+   as the buttons having been pushed away from the mark.
 
-     mark -> name     1.000  the name belongs to the mark
-     name -> lede     1.618  the lede explains the mark and the name
-     lede -> buttons  2.618  reading ends, acting begins
+   The three are now even. 1.8 / 1.4 / 1.7 of the rhythm, which look like one gap
+   because they nearly are; the full measurement, and why they cannot all be the
+   same number, is on .hero--brand .hero__cta below where all three are set.
 
-   Three steps, where there were two. The name is the wordmark the mark used
-   to carry as a drawn monogram over a wordmark, back as type, and it keeps the
-   1.000 step it had then: it is part of the lockup, not a separate block of
-   the page.
-
-   One variable drives all three, so the whole stack retunes from a single
-   number and the ratios survive.
+   One variable still drives all three, so the whole stack retunes from a single
+   number.
 
    Neither boundary at the name is the nominal value, and both differences are
    font metrics rather than spacing. The name's box carries 0.5em of slack under
@@ -343,9 +403,15 @@ MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
    The weight is the h1's own 800 rather than consulting's 400: theirs is a
    bitmap face at kicker size where weight adds nothing legible, this one is
    JetBrains Mono, where 800 is visibly heavier and is what the lockup needs to
-   hold the same ground the artwork does. */
+   hold the same ground the artwork does.
+
+   The margin is the first of the three even gaps and is explained on
+   .hero--brand .hero__cta below, where all three are set together. 1.8 of the
+   rhythm against the 1.83 the measurement asks for; this is the one that was
+   already closest, because the artwork above it is a block image with no leading
+   of its own to give back. */
 .hero__name {
-  margin: calc(var(--rhythm) * 1) 0 0;
+  margin: calc(var(--rhythm) * 1.8) 0 0;
   margin-right: -0.5em;
   font-family: var(--font-display);
   font-size: 6.6cqw;
@@ -355,19 +421,130 @@ MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
   color: var(--color-text-strong);
 }
 
-/* Lede to buttons: the step below, and an override of the base .hero__cta's
-   flat 32px, which would otherwise stack on top of the rhythm instead of
-   stepping with it. */
+/* The name in chrome, to match the smiley above it, which is a rendered chrome
+   ball. It is the gradient rather than a bitmap for one reason that matters:
+   this is the h1's accessible name, so it has to stay real text. background-clip
+   paints the metal into the glyphs and leaves the text itself alone.
+
+   Guarded by @supports because the failure mode is not a degraded wordmark, it
+   is no wordmark: color: transparent outside a block that background-clip
+   actually applies is an invisible h1 and an unnameable page. A browser without
+   background-clip keeps --color-text-strong, which is what it was an hour ago.
+
+   The gradient is the standard chrome construction — bright sky above, a hard
+   horizon, the ground's reflection below — and the horizon is a hard stop rather
+   than a ramp because that is the whole trick. A chrome tube is not a smooth
+   bevel: it is a blown specular lying against a dark line, because a tube that
+   small has no room to show a gradient.
+
+   One departure from the usual recipe, and it is forced by the page rather than
+   chosen. The recipe's darkest stop is near-black, and near-black is invisible
+   here: the ground is #0a0a0a with the video over it. Measured by hiding this
+   element and sampling the backdrop behind it at 56 points across the loop, the
+   brightest pixel that ever passes behind these letters is L 0.0235 — at t=5.1s,
+   where the ribbon's edge swings closest. So:
+
+     gradient stop    L      against that worst backdrop
+       #3d4753     0.0612          1.51:1     the recipe's floor — fails
+       #55606f     0.1144          2.24:1     fails
+       #6d7b8d     0.1934          3.31:1     clears, and was where this sat
+       #8b98ab     0.3089          4.88:1     where it sits now
+
+   It was at #6d7b8d first, which was the darkest value that cleared 3:1 — the bar
+   for large text, and this is 29.6px of type. That was the wrong way to read the
+   constraint. It met the number and looked like a shadow with a chrome gradient
+   laid over it rather than like metal, because a tube photographed against a dark
+   room does not have a black side: it picks up ambient light, and its dark band
+   is a mid grey. #8b98ab is that grey. It nearly doubles the margin over the
+   backdrop, 3.31:1 to 4.88:1, and the whole lower half of the ramp has come up
+   with it rather than the one stop being lifted out of a still-heavy gradient.
+
+   The stops are placed for the cap band, not the line box. The span is 1em tall
+   with line-height 1 and the caps occupy roughly 7% to 80% of it, so everything
+   outside that is clipped away by background-clip and is only there to make the
+   ends of the ramp land somewhere sensible. The horizon sits at 46%, which is
+   just above the optical centre of the caps.
+
+   drop-shadow and not text-shadow: text-shadow paints behind the glyphs, and
+   the glyphs here are filled by the gradient, so it would show through them
+   rather than around them. filter operates on the composited result, which is
+   the shape of the letters. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero__name {
+    color: transparent;
+    background-image: linear-gradient(180deg,
+      #ffffff 0%,
+      #f4f8fc 10%,
+      #e0e8f2 18%,
+      #c4d0e0 26%,
+      #a8b5c8 34%,
+      #93a1b5 41%,
+      #8b98ab 46%,
+      #9aa8bd 50%,
+      #b4c1d3 57%,
+      #d2dbe8 66%,
+      #eaf0f7 74%,
+      #c8d3e1 82%,
+      #a3b0c3 90%,
+      #8b98ab 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.75));
+  }
+}
+
+/* The three gaps in the lockup — artwork to name, name to lede, lede to buttons
+   — are set from one number so they read as even. They were a golden-ratio
+   scale, 1 : 1.618 : 2.618 of --rhythm, which is a scale rather than a gap and
+   showed: measured as INK gaps, baseline plus the font's own ascent and descent
+   rather than box to box, they came out
+
+     viewport    artwork>name   name>lede   lede>buttons   spread
+     1920x1080         23.4         43.3           57.0       33.6
+     1024x667          17.3         30.9           41.8       24.5
+      390x844          15.0         27.6           35.7       20.7
+
+   A near-1 : 2 : 2.4 progression. Nobody draws that on purpose, and the eye reads
+   it as the buttons having been pushed away from the mark rather than as three
+   even steps.
+
+   They are not one value, and cannot be, because each block hides slack the eye
+   does not count as space: the name's line box carries ascent above the caps and
+   descent below the baseline, and the lede's line-height 1.6 puts half a leading
+   above and below the text. Subtracting each margin from its ink gap gives the
+   slack that has to be taken back out — measured at 0.117 x the name's font-size
+   for the first, and rather more for the second and third, which carry the
+   lede's leading as well.
+
+   So the three are 1.8, 1.4 and 1.7 of the rhythm, against the ~1.83, ~1.40 and
+   ~1.74 the measurement asks for. Not exact — a reader cannot see 2px of gap — and
+   the residual spread across seventeen viewports from 320x568 to 1920x1080 is
+   under 1.5px, which is well inside "even".
+
+   The 1.8 and 1.4 are nearly a rhythm apart, which is the point: they look like
+   the same gap because they nearly are. Only the third, at 1.7, stands further
+   off, because the lede's bottom leading is real space under real text and
+   pretending otherwise would close the buttons onto the paragraph.
+
+   All three are shorter than the scale they replace, so the lockup is 3 to 6px
+   shorter than it was rather than taller. That matters at 320x568 and 360x640,
+   which are the two viewports that already overflow. */
 .hero--brand .hero__cta {
-  margin-top: calc(var(--rhythm) * 2.618);
+  margin-top: calc(var(--rhythm) * 1.7);
 }
 
 .hero__lede {
   /* Was 52ch here plus a `.hero p { max-width: 60ch }` elsewhere, which
      won on specificity (0,1,1 vs 0,1,0) and silently rendered 60ch. One
-     rule now, holding the value that was actually in effect. */
+     rule now, holding the value that was actually in effect.
+
+     1.4 of the rhythm, the middle of the three even gaps and the smallest of
+     them — see .hero--brand .hero__cta below. It has to come down furthest
+     from the old scale's 1.618 because this block hides the most slack: the
+     name's descent below the baseline above it, plus half of this paragraph's
+     own 1.6 leading. */
   max-width: 60ch;
-  margin: calc(var(--rhythm) * 1.618) 0 0;
+  margin: calc(var(--rhythm) * 1.4) 0 0;
   font-family: var(--font-body);
   font-size: clamp(0.9375rem, 1.15vw, 1.125rem);
   line-height: 1.6;

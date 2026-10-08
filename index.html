@@ -21,9 +21,14 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/layout.css">
-    <!-- The hero background is a CSS custom property, so nothing in the markup
-         points at it and the browser only finds it after parsing the CSS. -->
-    <link rel="preload" as="image" href="img/landing-hero-bg.webp">
+    <!-- No preload here any more. This line used to preload the hero still,
+         because the hero background was a custom property and so nothing in the
+         markup pointed at it and the browser could not find it until it had
+         parsed the CSS. The backdrop is a <video> with a poster attribute in the
+         body now, so both are discoverable by the parser and neither needs
+         telling. Preloading the video instead was considered and rejected: it
+         would fetch 1.3MB for the readers who asked for reduced motion and are
+         only ever going to see the poster. -->
     <!-- Blocking on purpose: decides before first paint whether the
          English markup is about to be translated. See the file. -->
     <script src="js/lang-boot.js"></script>
@@ -38,7 +43,33 @@
   </defs>
 </svg>
 <div class="hero__bg" aria-hidden="true"></div>
-<div class="hero__photo" aria-hidden="true"></div>
+<!-- The hero backdrop is a video: a 10-second seamless loop of the blue ribbon,
+     at 960x540 and 1.3MB, sitting in the layer the still photograph used to
+     occupy. Nothing about the layer changed — same z-index, same mask, same
+     dimming — so the only difference on the page is that the pixels move.
+
+     VP9 in WebM and nothing else. An H.264 fallback at a size worth shipping
+     (369KB) bands visibly across the smooth dark-blue falloff, which is the one
+     thing this footage is made of, and a browser that cannot play VP9 gets the
+     poster instead — which is frame 0 of this same file, so the fallback is the
+     artwork rather than a different picture.
+
+     autoplay is deliberately absent and preload is "none". main.js calls play()
+     only when the reader has not asked for reduced motion, so someone who would
+     be shown a still anyway never downloads 1.3MB to be shown that still. With
+     JavaScript off the poster is the whole of it, which is a finished page and
+     not a broken one.
+
+     muted and playsinline are both required for autoplay to be permitted at all
+     on iOS and on Android; neither is about this video, which has no audio
+     track to begin with (the encode is -an).
+
+     aria-hidden because it is decoration: there is nothing in it a screen
+     reader could be told that the page does not already say in text. -->
+<video class="hero__photo" data-hero-video aria-hidden="true" muted loop playsinline
+       preload="none" poster="img/hero-bg-poster.webp">
+    <source src="img/hero-bg-loop.webm" type="video/webm">
+</video>
 <div class="hero__scrim" aria-hidden="true"></div>
 
 <a href="#main" class="sr-only" data-i18n="aria.skip">Skip to content</a>

@@ -64,6 +64,35 @@
   margin-left: 0.125rem;
 }
 
+/* The two destinations are the same width, so the pair reads as a pair.
+   "CONSULTING" is ten characters and "STUDIO" is six, and as auto-width buttons
+   they came out 167px and 126px — 41px of difference, which is visible as an
+   uneven pair from across the room and is the reason the row looked accidental
+   rather than composed.
+
+   min-width rather than width, for two reasons. width: 100% would make each
+   button fill its flex line, so the stacked state below 370px would become two
+   full-bleed bars rather than two equal stamps. And min-width only has to name
+   the wider of the two, so STUDIO grows to meet CONSULTING and CONSULTING does
+   not move at all.
+
+   10.5em is CONSULTING's own width at 16px, which is its 127px of label, gap
+   and mark plus the 40px of padding either side — rounded up by 1px, which is
+   the difference between 167 and 168 and is worth nothing to anyone. It is in em
+   rather than px because that is what makes the narrow-width tier below work:
+   the tier drops font-size, and a min-width in px would stay at 168 while the
+   label inside it shrank, leaving the two buttons equal and both too wide.
+
+   The cost is the wrap threshold. Two 168px buttons and the 40px gap is 376px,
+   which needs a 408px window, so the row now wraps below that where it used to
+   wrap below about 370px. That is 38px of extra stacking on a phone and it is
+   the honest price of the pair being even; the tier below gives it back down to
+   the live site's own 370px, and below that they stack two-up and centred,
+   which is what they did before either change. */
+.hero__cta--row .btn {
+  min-width: 10.5em;
+}
+
 /* Language switcher. It sits directly above the email row rather than down
    in the footer, because it reads as chrome for the address below it and
    that leaves the footer itself as the socials and the copyright. It stays at

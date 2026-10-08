@@ -132,7 +132,7 @@
   });
 
   // A page restored from the browser's back/forward cache keeps its frozen DOM
-  // and JS state — none of the code above re-runs. So a language picked on
+  // and JS state — none of the code above re-reuns. So a language picked on
   // another page in the meantime would never reach this page when the user
   // navigates back to it. Re-read the stored choice and re-apply if it moved.
   window.addEventListener("pageshow", (event) => {
@@ -140,4 +140,28 @@
     const lang = detectLanguageSync();
     if (lang !== currentLang) applyTranslations(lang);
   });
+
+  // The hero backdrop video.
+  //
+  // It is not autoplayed from the markup and it is not preloaded: both are on
+  // this side of the decision, so a reader who asked for reduced motion is never
+  // made to download 1.3MB of video in order to be shown the poster that is
+  // already sitting there. The poster is the first frame of the loop, so "does
+  // not play" and "plays" are the same picture at different times rather than
+  // two different pictures.
+  //
+  // matchMedia is read once and not watched. A reader who turns reduced motion on
+  // while the page is open has already got the video by then, and stopping it
+  // mid-loop is a worse answer than letting it finish — the switch is about the
+  // page as a whole, not about this element.
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll("video[data-hero-video]").forEach((video) => {
+      // play() rejects when the browser refuses autoplay — Low Power Mode on
+      // iOS, a data-saver extension, a locked-down embed. The poster is the
+      // fallback in every one of those cases, so there is nothing to do but not
+      // throw an unhandled rejection at the console.
+      video.play().catch(() => {});
+    });
+  }
 })();
+
