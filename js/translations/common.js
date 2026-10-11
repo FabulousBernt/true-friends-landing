@@ -28,7 +28,6 @@ window.TF_TRANSLATIONS = {
       copyright: "© {year} True Friends. All rights reserved.",
     },
     aria: {
-      newTab: "(opens in a new tab)",
       skip: "Skip to content",
       socialLinks: "Social links",
       langSwitch: "Switch language",
@@ -44,7 +43,6 @@ window.TF_TRANSLATIONS = {
       copyright: "© {year} True Friends. All rights reserved.",
     },
     aria: {
-      newTab: "(öppnas i en ny flik)",
       skip: "Hoppa till innehåll",
       socialLinks: "Sociala kanaler",
       langSwitch: "Byt språk",

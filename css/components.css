@@ -54,16 +54,6 @@
   transform: none;
 }
 
-/* The external-window mark on the landing's two destination buttons. Sized
-   to the button's own type rather than a fixed pixel value, so it tracks
-   the label. `square` line caps match the site's zero-radius geometry. */
-.btn__external {
-  width: 1em;
-  height: 1em;
-  flex: none;
-  margin-left: 0.125rem;
-}
-
 /* The two destinations are the same width, so the pair reads as a pair.
    "CONSULTING" is ten characters and "STUDIO" is six, and as auto-width buttons
    they came out 167px and 126px — 41px of difference, which is visible as an
@@ -76,12 +66,19 @@
    the wider of the two, so STUDIO grows to meet CONSULTING and CONSULTING does
    not move at all.
 
-   10.5em is CONSULTING's own width at 16px, which is its 127px of label, gap
-   and mark plus the 40px of padding either side — rounded up by 1px, which is
-   the difference between 167 and 168 and is worth nothing to anyone. It is in em
-   rather than px because that is what makes the narrow-width tier below work:
-   the tier drops font-size, and a min-width in px would stay at 168 while the
-   label inside it shrank, leaving the two buttons equal and both too wide.
+   10.5em is the width CONSULTING had at 16px while it still carried the
+   external-window mark — 127px of label, gap and mark plus the 40px of padding
+   either side, rounded up by 1px, which is the difference between 167 and 168
+   and is worth nothing to anyone. The mark is gone, so 10.5em is now wider than
+   either label needs; it is kept because the size is the composition, and
+   dropping to the snug ~8.9em would shrink the pair and move the wrap threshold
+   for no gain. The label is centred in the box either way, so the extra room
+   reads as padding rather than as a hole.
+
+   It is in em rather than px because that is what makes the narrow-width tier
+   below work: the tier drops font-size, and a min-width in px would stay at 168
+   while the label inside it shrank, leaving the two buttons equal and both too
+   wide.
 
    The cost is the wrap threshold. Two 168px buttons and the 40px gap is 376px,
    which needs a 408px window, so the row now wraps below that where it used to

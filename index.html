@@ -97,33 +97,14 @@
             <p class="hero__lede" data-i18n="hero.lede">A creative and technical studio &amp; consulting firm based in Motala, Sweden, but available worldwide.</p>
 
             <div class="hero__cta hero__cta--row">
-                <a class="btn" href="https://consulting.truefriends.se/"
-                   target="_blank" rel="noopener">
+                <!-- Plain cross-document links: these take over the tab rather
+                     than opening a second one, so the back button still works
+                     and there is no new-tab announcement to make. -->
+                <a class="btn" href="https://consulting.truefriends.se/">
                     <span data-i18n="hero.consulting">Consulting</span>
-                    <!-- Decorative: the accessible announcement is the sr-only text
-                         after it. An icon alone does not tell a screen-reader user
-                         that a new tab is about to open. -->
-                    <svg class="btn__external" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="square"
-                         aria-hidden="true">
-                        <path d="M14 4h6v6"/><path d="M20 4 11 13"/>
-                        <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
-                    </svg>
-                    <span class="sr-only" data-i18n="aria.newTab">(opens in a new tab)</span>
                 </a>
-                <a class="btn" href="https://studio.truefriends.se/"
-                   target="_blank" rel="noopener">
+                <a class="btn" href="https://studio.truefriends.se/">
                     <span data-i18n="hero.studio">Studio</span>
-                    <!-- Decorative: the accessible announcement is the sr-only text
-                         after it. An icon alone does not tell a screen-reader user
-                         that a new tab is about to open. -->
-                    <svg class="btn__external" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="square"
-                         aria-hidden="true">
-                        <path d="M14 4h6v6"/><path d="M20 4 11 13"/>
-                        <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
-                    </svg>
-                    <span class="sr-only" data-i18n="aria.newTab">(opens in a new tab)</span>
                 </a>
             </div>
         </div>
