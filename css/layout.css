@@ -409,7 +409,14 @@ MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
    .hero--brand .hero__cta below, where all three are set together. 1.8 of the
    rhythm against the 1.83 the measurement asks for; this is the one that was
    already closest, because the artwork above it is a block image with no leading
-   of its own to give back. */
+   of its own to give back.
+
+   The colour is the lede's cream, not the chrome gradient it wore when it had
+   to match the smiley's metal. A flat fill needs neither background-clip nor
+   the @supports guard that kept the gradient from failing into an invisible
+   h1, and the drop-shadow went with the gradient: it was there to hold the
+   metal off the moving video, and cream against a backdrop whose brightest
+   ever pixel is L 0.0235 needs no help. */
 .hero__name {
   margin: calc(var(--rhythm) * 1.8) 0 0;
   margin-right: -0.5em;
@@ -418,79 +425,7 @@ MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.5em;
-  color: var(--color-text-strong);
-}
-
-/* The name in chrome, to match the smiley above it, which is a rendered chrome
-   ball. It is the gradient rather than a bitmap for one reason that matters:
-   this is the h1's accessible name, so it has to stay real text. background-clip
-   paints the metal into the glyphs and leaves the text itself alone.
-
-   Guarded by @supports because the failure mode is not a degraded wordmark, it
-   is no wordmark: color: transparent outside a block that background-clip
-   actually applies is an invisible h1 and an unnameable page. A browser without
-   background-clip keeps --color-text-strong, which is what it was an hour ago.
-
-   The gradient is the standard chrome construction — bright sky above, a hard
-   horizon, the ground's reflection below — and the horizon is a hard stop rather
-   than a ramp because that is the whole trick. A chrome tube is not a smooth
-   bevel: it is a blown specular lying against a dark line, because a tube that
-   small has no room to show a gradient.
-
-   One departure from the usual recipe, and it is forced by the page rather than
-   chosen. The recipe's darkest stop is near-black, and near-black is invisible
-   here: the ground is #0a0a0a with the video over it. Measured by hiding this
-   element and sampling the backdrop behind it at 56 points across the loop, the
-   brightest pixel that ever passes behind these letters is L 0.0235 — at t=5.1s,
-   where the ribbon's edge swings closest. So:
-
-     gradient stop    L      against that worst backdrop
-       #3d4753     0.0612          1.51:1     the recipe's floor — fails
-       #55606f     0.1144          2.24:1     fails
-       #6d7b8d     0.1934          3.31:1     clears, and was where this sat
-       #8b98ab     0.3089          4.88:1     where it sits now
-
-   It was at #6d7b8d first, which was the darkest value that cleared 3:1 — the bar
-   for large text, and this is 29.6px of type. That was the wrong way to read the
-   constraint. It met the number and looked like a shadow with a chrome gradient
-   laid over it rather than like metal, because a tube photographed against a dark
-   room does not have a black side: it picks up ambient light, and its dark band
-   is a mid grey. #8b98ab is that grey. It nearly doubles the margin over the
-   backdrop, 3.31:1 to 4.88:1, and the whole lower half of the ramp has come up
-   with it rather than the one stop being lifted out of a still-heavy gradient.
-
-   The stops are placed for the cap band, not the line box. The span is 1em tall
-   with line-height 1 and the caps occupy roughly 7% to 80% of it, so everything
-   outside that is clipped away by background-clip and is only there to make the
-   ends of the ramp land somewhere sensible. The horizon sits at 46%, which is
-   just above the optical centre of the caps.
-
-   drop-shadow and not text-shadow: text-shadow paints behind the glyphs, and
-   the glyphs here are filled by the gradient, so it would show through them
-   rather than around them. filter operates on the composited result, which is
-   the shape of the letters. */
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .hero__name {
-    color: transparent;
-    background-image: linear-gradient(180deg,
-      #ffffff 0%,
-      #f4f8fc 10%,
-      #e0e8f2 18%,
-      #c4d0e0 26%,
-      #a8b5c8 34%,
-      #93a1b5 41%,
-      #8b98ab 46%,
-      #9aa8bd 50%,
-      #b4c1d3 57%,
-      #d2dbe8 66%,
-      #eaf0f7 74%,
-      #c8d3e1 82%,
-      #a3b0c3 90%,
-      #8b98ab 100%);
-    -webkit-background-clip: text;
-            background-clip: text;
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.75));
-  }
+  color: var(--color-cream);
 }
 
 /* The three gaps in the lockup — artwork to name, name to lede, lede to buttons
