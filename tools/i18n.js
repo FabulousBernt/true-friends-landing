@@ -8,8 +8,7 @@
  * Why the fallbacks matter: the text inside a data-i18n element is what the
  * browser paints before the translation pass runs, and what it keeps when
  * scripting is off. Let it drift and the page flashes the stale value on
- * every load — which is how "TF Classic" kept surfacing for a moment after
- * the button had been renamed to "TF 1996".
+ * every load.
  *
  * Run `sync` after editing a translation file or regenerating a page, and
  * `check` before committing.
@@ -23,20 +22,9 @@ const ATTRS = [
   "data-i18n-content", "data-i18n-href", "data-i18n-title",
 ];
 
-// Each page loads the shared dictionary plus one of its own. The reference-case
-// templates are kept in the list so their chrome stays in sync, but they are
-// exempt from the key scan: their prose keys carry a literal <slug> that the
-// person copying the file fills in.
-const pages = [];
-for (const dir of [".", "1996"]) {
-  pages.push([`${dir}/index.html`, dir, "landing.js"]);
-  pages.push([`${dir}/consulting.html`, dir, "consulting.js"]);
-  pages.push([`${dir}/studio.html`, dir, "studio.js"]);
-  pages.push([`${dir}/reference-cases/template.html`, dir, "consulting.js", "template"]);
-  for (const slug of ["avarn", "bufab", "epiroc", "kopparbergs-brewery", "ske-kraft", "sectra"]) {
-    pages.push([`${dir}/reference-cases/johnny-vigersten/${slug}.html`, dir, `johnny-vigersten/${slug}.js`]);
-  }
-}
+// Each page loads the shared dictionary plus one of its own. index.html is the
+// only page left in this repository, so the list is one entry long.
+const pages = [["index.html", ".", "landing.js"]];
 
 function dictionaries(dir, page) {
   // The translation files assign onto `window`, so give them one.
