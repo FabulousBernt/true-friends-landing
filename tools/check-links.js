@@ -24,16 +24,11 @@ const walk = (d, out = []) => {
 };
 
 const files = walk(root);
-/* `template.html` is a scaffold meant to be copied and filled in, not a page.
-   Its live markup carries deliberate placeholders — <consultant-slug>, <slug>,
-   <filename> — which are not references and cannot resolve. It is linked from
-   nowhere and served to nobody. */
-const html = files.filter(f => f.endsWith('.html') && path.basename(f) !== 'template.html');
+const html = files.filter(f => f.endsWith('.html'));
 
-/* HTML comments are stripped before scanning. The reference-case pages carry
-   instructional blocks showing how to add a new case, full of placeholders
-   like `<slug>` and `src="..."`. Those are documentation, not references, and
-   scanning them reports 30 broken links in a repo that is entirely intact. */
+/* HTML comments are stripped before scanning. The markup carries explanatory
+   blocks with path-like prose, which are documentation rather than
+   references. */
 const strip = src => src.replace(/<!--[\s\S]*?-->/g, '');
 const idsOf = f => new Set(
   [...strip(fs.readFileSync(f, 'utf8')).matchAll(/\bid="([^"]+)"/g)].map(m => m[1])
@@ -64,10 +59,8 @@ for (const f of html) {
     let abs = path.resolve(path.dirname(f), rel.split('?')[0]);
     checked++;
     if (!fs.existsSync(abs)) { report(f, ref, 'file not found'); continue; }
-    /* A link to a directory is served as its index.html. This matters: after
-       the rename, reference cases point at `../../#services`, and checking
-       only that the directory exists would pass while the anchor is missing —
-       which is the exact failure Review Focus 2 names. */
+    /* A link to a directory is served as its index.html, so checking only that
+       the directory exists would pass while the anchor is missing. */
     if (fs.statSync(abs).isDirectory()) {
       const idx = path.join(abs, 'index.html');
       if (!fs.existsSync(idx)) { report(f, ref, 'directory has no index.html'); continue; }
@@ -82,7 +75,7 @@ for (const f of html) {
 // Paths that live in translation data rather than markup.
 for (const f of files.filter(f => f.includes(path.sep + 'translations' + path.sep) || f.endsWith('translations.js'))) {
   const src = fs.readFileSync(f, 'utf8');
-  for (const m of src.matchAll(/"((?:img|css|js|cv)\/[^"]+)"/g)) {
+  for (const m of src.matchAll(/"((?:img|css|js)\/[^"]+)"/g)) {
     const abs = path.resolve(root, m[1]);
     checked++;
     if (!fs.existsSync(abs)) report(f, m[1], 'referenced from translation data');

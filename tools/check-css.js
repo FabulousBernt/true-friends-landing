@@ -12,10 +12,7 @@
  *   WARN   a class in index.html that no rule matches (may be inline-styled)
  *
  * Only the root index.html is scanned, and that is the whole justification: it
- * is the sole page in this repository that loads these four stylesheets.
- * consulting.html, studio.html and the reference-case pages are meta-refresh
- * stubs, and 1996/ has its own CSS. So DEAD means dead everywhere, not dead
- * on one page of many.
+ * is the only page in this repository. So DEAD means dead everywhere.
  *
  * The DEAD check exists because the alternative is invisible. A stylesheet
  * that used to be shared across five pages accumulates rules for the four
@@ -62,7 +59,7 @@ const stripHtml = s => s.replace(/<!--[\s\S]*?-->/g, '');
 
 /* ---- classes: rule -> element, and element -> rule ----
    index.html gets the HTML stripper: a commented-out block would otherwise
-   keep a dead rule alive silently. None of its five comments is one today. */
+   keep a dead rule alive silently. None of its comments is one today. */
 const inHtml = new Set();
 for (const m of stripHtml(read('index.html')).matchAll(/class="([^"]*)"/g)) {
   for (const c of m[1].split(/\s+/)) if (c) inHtml.add(c);

@@ -6,13 +6,8 @@
  * status messages — belonged to pages that moved to other domains at the
  * split, and none of it had a reader in this repository.
  *
- * 1996/js/translations/ has its own full copy and is not affected. This file
- * has now been trimmed twice for this repository; brand/README.md records the
- * first pass under "One wrinkle".
- *
- * The language switcher is in the footer and is the only route to these
- * strings: main.js does no locale detection on purpose, so there is no
- * automatic fallback to Swedish.
+ * The language switcher is the only route to these strings: main.js does no
+ * locale detection on purpose, so there is no automatic fallback to Swedish.
  *
  * Keys are referenced from HTML via:
  *   data-i18n           → sets textContent
