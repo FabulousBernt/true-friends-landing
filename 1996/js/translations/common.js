@@ -10,7 +10,6 @@
  * Keys are referenced from HTML via:
  *   data-i18n              → textContent
  *   data-i18n-html         → innerHTML (trusted markup only)
- *   data-i18n-placeholder  → placeholder attribute
  *   data-i18n-aria-label   → aria-label attribute
  *   data-i18n-content      → content attribute (meta tags)
  *   data-i18n-href         → href attribute (per-language files)
@@ -25,7 +24,6 @@ window.TF_TRANSLATIONS = {
 
     /* ---------- Browser chrome ---------- */
     ui: {
-      appName: "True Friends 96",
       title: {
         start: "True Friends — Welcome — True Friends 96",
         consulting: "True Friends — Consulting — True Friends 96",
@@ -67,7 +65,6 @@ window.TF_TRANSLATIONS = {
         home: "Home",
       },
       bookmarks: {
-        heading: "True Friends",
         cases: "Reference cases",
       },
       options: {
@@ -88,7 +85,6 @@ window.TF_TRANSLATIONS = {
         forward: "Forward",
         home: "Home",
         reload: "Reload",
-        images: "Images",
         print: "Print",
         find: "Find",
         stop: "Stop",
@@ -104,7 +100,6 @@ window.TF_TRANSLATIONS = {
         consulting: "Consulting",
         studio: "Studio",
         gallery: "Gallery",
-        cases: "Reference Cases",
       },
 
       status: {
@@ -221,12 +216,9 @@ window.TF_TRANSLATIONS = {
       counter: "You are visitor number",
       updated: "Last updated: {year}",
       badges: {
-        res: "Best viewed at 800 × 600",
-        handcoded: "Hand-coded, no frames",
         motala: "Made in Motala, Sweden",
         modem: "Dial-up friendly",
       },
-      altOff: "Image not loaded — Auto Load Images is off.",
       travel: "Back to the future ({year} website)",
     },
 
@@ -240,11 +232,9 @@ window.TF_TRANSLATIONS = {
       contact: "Contact",
     },
     hero: {
-      cta: "Say hi",
       consulting: "Consulting",
       studio: "Studio",
     },
-    services: { label: "Services" },
     refCase: {
       about: "About",
       myRole: "My role",
@@ -252,7 +242,6 @@ window.TF_TRANSLATIONS = {
       back: "Back to Consulting",
     },
     contact: {
-      label: "Contact",
       lede: "Find us on our social media channels, reach out via email or send a message through the form below.",
       placeholders: {
         firstName: "First name",
@@ -264,9 +253,7 @@ window.TF_TRANSLATIONS = {
       otherWays: "Other ways to reach us",
     },
     modal: {
-      title: "Say hi!",
       desc: "Please fill out the contact form and we will get back to you as soon as we can.",
-      close: "Close",
       send: "Send",
     },
     footer: {
@@ -285,15 +272,10 @@ window.TF_TRANSLATIONS = {
       skip: "Skip to the document",
       home: "True Friends home",
       socialLinks: "Social links",
-      langSwitch: "Switch language",
       lightbox: "Photo gallery",
       prevPhoto: "Previous photo",
       nextPhoto: "Next photo",
       closeLightbox: "Close",
-      firstName: "First name",
-      lastName: "Last name",
-      email: "Email",
-      message: "Message",
       minimize: "Minimize",
       maximize: "Maximize",
       close: "Close",
@@ -317,7 +299,6 @@ window.TF_TRANSLATIONS = {
     },
 
     ui: {
-      appName: "True Friends 96",
       title: {
         start: "True Friends — Välkommen — True Friends 96",
         consulting: "True Friends — Konsult — True Friends 96",
@@ -359,7 +340,6 @@ window.TF_TRANSLATIONS = {
         home: "Hem",
       },
       bookmarks: {
-        heading: "True Friends",
         cases: "Referensuppdrag",
       },
       options: {
@@ -380,7 +360,6 @@ window.TF_TRANSLATIONS = {
         forward: "Framåt",
         home: "Hem",
         reload: "Läs om",
-        images: "Bilder",
         print: "Skriv ut",
         find: "Sök",
         stop: "Stopp",
@@ -396,7 +375,6 @@ window.TF_TRANSLATIONS = {
         consulting: "Konsult",
         studio: "Studio",
         gallery: "Galleri",
-        cases: "Referensuppdrag",
       },
 
       status: {
@@ -512,12 +490,9 @@ window.TF_TRANSLATIONS = {
       counter: "Du är besökare nummer",
       updated: "Senast uppdaterad: {year}",
       badges: {
-        res: "Bäst i 800 × 600",
-        handcoded: "Handkodad, inga ramar",
         motala: "Gjord i Motala, Sverige",
         modem: "Modemvänlig i 33,6 kbit/s",
       },
-      altOff: "Bilden är inte inläst — automatisk bildinläsning är av.",
       travel: "Tillbaka till framtiden ({year} webbplats)",
     },
 
@@ -530,11 +505,9 @@ window.TF_TRANSLATIONS = {
       contact: "Kontakt",
     },
     hero: {
-      cta: "Säg hej",
       consulting: "Konsult",
       studio: "Studio",
     },
-    services: { label: "Tjänster" },
     refCase: {
       about: "Om uppdraget",
       myRole: "Min roll",
@@ -542,7 +515,6 @@ window.TF_TRANSLATIONS = {
       back: "Tillbaka till Konsult",
     },
     contact: {
-      label: "Kontakt",
       lede: "Hitta oss i våra sociala kanaler, kontakta oss via e‑post eller skicka ett meddelande via formuläret nedan.",
       placeholders: {
         firstName: "Förnamn",
@@ -554,9 +526,7 @@ window.TF_TRANSLATIONS = {
       otherWays: "Andra sätt att nå oss",
     },
     modal: {
-      title: "Säg hej!",
       desc: "Fyll i kontaktformuläret så återkommer vi så snart vi kan.",
-      close: "Stäng",
       send: "Skicka",
     },
     footer: {
@@ -575,15 +545,10 @@ window.TF_TRANSLATIONS = {
       skip: "Hoppa till dokumentet",
       home: "True Friends startsida",
       socialLinks: "Sociala kanaler",
-      langSwitch: "Byt språk",
       lightbox: "Fotogalleri",
       prevPhoto: "Föregående foto",
       nextPhoto: "Nästa foto",
       closeLightbox: "Stäng",
-      firstName: "Förnamn",
-      lastName: "Efternamn",
-      email: "E‑post",
-      message: "Meddelande",
       minimize: "Minimera",
       maximize: "Maximera",
       close: "Stäng",

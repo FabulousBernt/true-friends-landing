@@ -63,13 +63,10 @@
       .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), obj);
 
   // Substituted into any string containing `{year}` — the footer copyright
-  // rolls over on its own that way.
+  // rolls over on its own that way. The links across to the other era name
+  // the current year the same way, through `ui.tb.travel`.
   const CURRENT_YEAR = new Date().getFullYear();
   const substitute = (s) => s.replace("{year}", CURRENT_YEAR);
-
-  /* The links across to the other era name the current year, so they are
-     written from the clock rather than typed into the markup. */
-  $$("[data-year]").forEach((el) => { el.textContent = String(CURRENT_YEAR); });
 
   let currentLang = DEFAULT_LANG;
 
@@ -88,11 +85,9 @@
   }
 
   const ATTR_MAP = {
-    "data-i18n-placeholder": "placeholder",
     "data-i18n-aria-label": "aria-label",
     "data-i18n-content": "content",
     "data-i18n-href": "href",
-    "data-i18n-alt": "alt",
     "data-i18n-title": "title",
   };
 
@@ -692,10 +687,10 @@
   /* ====================================================================
    * Gallery + Image Viewer
    *
-   * To add a photo: drop the file into img/gallery/, run
-   * `bash tools/build-gallery.sh`, and add its filename below. Each entry
-   * renders one square tile from the 400px thumbnail; the full-size file is
-   * only fetched once the viewer opens.
+   * To add a photo: drop the full-size file into img/gallery/, its 400px
+   * thumbnail into img/gallery/thumbs/ under the same name, and add that
+   * name below. Each entry renders one square tile from the thumbnail; the
+   * full-size file is only fetched once the viewer opens.
    * ==================================================================== */
 
   const GALLERY_IMAGES = [

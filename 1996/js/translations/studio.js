@@ -1,23 +1,18 @@
 /* True Friends — studio page translations
  *
- * Adds studio-only keys onto TF_TRANSLATIONS. Site-wide labels
- * (nav, footer, aria, contact, modal, hero.cta,
- * hero.consulting/studio labels, tagline) live in
- * js/translations/common.js. The about section is page-specific —
- * studio and consulting each carry their own copy.
+ * Adds studio-only keys onto TF_TRANSLATIONS. Site-wide labels (nav, footer,
+ * aria, hero.consulting/studio labels) live in js/translations/common.js.
+ * The about section is page-specific — studio and consulting each carry
+ * their own copy.
  */
 window.TF_ADD_TRANSLATIONS({
   en: {
-    meta: {
-      title: "True Friends — Creative & Technical Studio",
-    },
     hero: {
       lede: {
         studio: "We offer services in web development, design, marketing, photo, video and editing.",
       },
     },
     about: {
-      label: "About",
       ledeHTML:
         'Here at True Friends, we deliver both a <span class="accent">creative</span> vision and <span class="accent">technical</span> expertise to every project and role we take on.',
       body1:
@@ -28,7 +23,6 @@ window.TF_ADD_TRANSLATIONS({
         "True Friends rests on a foundation of honesty, creativity, responsibility, and commitment. These pillars are essential for our work and our shared success.",
     },
     gallery: {
-      label: "Gallery",
       intro: "A selection of our photography. Click any thumbnail to open it in the image viewer.",
       count: "{n} images in this folder.",
     },
@@ -64,16 +58,12 @@ window.TF_ADD_TRANSLATIONS({
   },
 
   sv: {
-    meta: {
-      title: "True Friends — Kreativ & Teknisk Studio",
-    },
     hero: {
       lede: {
         studio: "Vi erbjuder tjänster inom webbproduktion, design, marknadsföring, foto, video och redigering.",
       },
     },
     about: {
-      label: "Om oss",
       ledeHTML:
         'Vi på True Friends levererar både en <span class="accent">kreativ</span> vision och <span class="accent">teknisk</span> expertis i varje projekt och roll som vi tar oss an.',
       // TODO: translate — still the previous shared Swedish copy,
@@ -86,7 +76,6 @@ window.TF_ADD_TRANSLATIONS({
         "True Friends är byggt på en grund av ärlighet, kreativitet, ansvar och engagemang. Dessa grundpelare är avgörande för vårt arbete och vår gemensamma framgång.",
     },
     gallery: {
-      label: "Galleri",
       intro: "Ett urval av vår fotografi. Klicka på en miniatyr så öppnas den i bildvisaren.",
       count: "{n} bilder i den här mappen.",
     },

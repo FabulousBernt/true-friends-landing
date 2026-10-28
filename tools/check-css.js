@@ -35,11 +35,12 @@
  * One known blind spot, stated rather than hidden: DEAD reads class
  * attributes out of index.html and does not read js/main.js, so a class that
  * JavaScript puts on an element at runtime is reported as dead even while the
- * script still names it. Eight were — gallery__item, gallery__tile,
- * lightbox__thumb and the rest, all assigned by the gallery and lightbox code
- * in main.js. That code is itself inert and is being deleted, so the
- * conclusion holds; but if it is ever revived, this tool will not notice the
- * stylesheet underneath it going missing. Read DEAD together with main.js.
+ * script still names it. That used to matter: eight classes — gallery__item,
+ * gallery__tile, lightbox__thumb and the rest — were assigned by the gallery
+ * and lightbox code in main.js, now deleted. Nothing in main.js touches a
+ * class today, so the blind spot is empty; if runtime class assignment ever
+ * returns, this tool will not notice the stylesheet underneath it going
+ * missing. Read DEAD together with main.js.
  */
 const fs = require('fs');
 const path = require('path');

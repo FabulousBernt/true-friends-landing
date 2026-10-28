@@ -1,23 +1,18 @@
 /* True Friends — consulting page translations
  *
- * Adds consulting-only keys onto TF_TRANSLATIONS. Site-wide labels
- * (nav, footer, aria, contact, modal, hero.cta,
- * hero.consulting/studio labels, tagline, refCase labels) live in
+ * Adds consulting-only keys onto TF_TRANSLATIONS. Site-wide labels (nav,
+ * footer, aria, hero.consulting/studio labels, refCase labels) live in
  * js/translations/common.js. The about section is page-specific —
  * consulting and studio each carry their own copy.
  */
 window.TF_ADD_TRANSLATIONS({
   en: {
-    meta: {
-      titleConsulting: "True Friends — Consulting",
-    },
     hero: {
       lede: {
         consulting: "We provide consulting services in testing, ux/ui design, web production, software development and cybersecurity.",
       },
     },
     about: {
-      label: "About",
       ledeHTML:
         'Here at True Friends, we deliver both a <span class="accent">creative</span> vision and <span class="accent">technical</span> expertise to every project and role we take on.',
       body1:
@@ -44,7 +39,6 @@ window.TF_ADD_TRANSLATIONS({
       },
     },
     team: {
-      label: "Consultants",
       cv: "Download cv",
       members: {
         johnny: {
@@ -58,16 +52,12 @@ window.TF_ADD_TRANSLATIONS({
   },
 
   sv: {
-    meta: {
-      titleConsulting: "True Friends — Konsult",
-    },
     hero: {
       lede: {
         consulting: "Vi erbjuder konsulttjänster inom testning, ux/ui-design, webbproduktion, mjukvaruutveckling och cybersäkerhet.",
       },
     },
     about: {
-      label: "Om oss",
       ledeHTML:
         'Vi på True Friends levererar både en <span class="accent">kreativ</span> vision och <span class="accent">teknisk</span> expertis i varje projekt och roll som vi tar oss an.',
       body1:
@@ -94,7 +84,6 @@ window.TF_ADD_TRANSLATIONS({
       },
     },
     team: {
-      label: "Konsulter",
       cv: "Ladda ner CV",
       members: {
         johnny: {

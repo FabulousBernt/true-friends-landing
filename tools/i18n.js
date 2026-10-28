@@ -19,9 +19,8 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const ATTRS = [
-  "data-i18n", "data-i18n-html", "data-i18n-placeholder", "data-i18n-aria-label",
-  "data-i18n-content", "data-i18n-href", "data-i18n-alt", "data-i18n-title",
-  "data-i18n-src",
+  "data-i18n", "data-i18n-html", "data-i18n-aria-label",
+  "data-i18n-content", "data-i18n-href", "data-i18n-title",
 ];
 
 // Each page loads the shared dictionary plus one of its own. The reference-case

@@ -48,7 +48,6 @@
   --doc-link: #0000ee;
   --doc-visited: #551a8b;
   --doc-active: #ee0000;
-  --doc-rule: #808080;
 
   /* ---------- What survives from the brand ---------- */
   /* The yellow is the one non-system colour in the build. It is rationed to
@@ -78,38 +77,6 @@
      the narrow breakpoint change these two and nothing else. */
   --desk-pad: 16px;
   --desk-foot: calc(var(--taskbar-h) + 20px);
-}
-
-/* ---------------------------------------------------------------------------
- * The four bevels. Two nested 1px steps each, exactly as Win95 drew them:
- *   .w-out  raised  — buttons, panels, window frames
- *   .w-in   sunken  — text fields, list boxes, the viewport
- *   .w-out-thin / .w-in-thin  single-step versions, for the toolbar rows and
- *                              status cells where the double step is loud
- * ------------------------------------------------------------------------ */
-.w-out {
-  box-shadow:
-    inset -1px -1px 0 0 var(--w-ink),
-    inset  1px  1px 0 0 var(--w-face-light),
-    inset -2px -2px 0 0 var(--w-gray),
-    inset  2px  2px 0 0 var(--w-white);
-}
-.w-in {
-  box-shadow:
-    inset -1px -1px 0 0 var(--w-white),
-    inset  1px  1px 0 0 var(--w-gray),
-    inset -2px -2px 0 0 var(--w-face-light),
-    inset  2px  2px 0 0 var(--w-ink);
-}
-.w-out-thin {
-  box-shadow:
-    inset -1px -1px 0 0 var(--w-gray),
-    inset  1px  1px 0 0 var(--w-white);
-}
-.w-in-thin {
-  box-shadow:
-    inset -1px -1px 0 0 var(--w-white),
-    inset  1px  1px 0 0 var(--w-gray);
 }
 
 /* ===========================================================================
@@ -417,7 +384,6 @@ body.is-maximized .browser { max-width: none; }
     inset 0  1px 0 0 var(--w-gray),
     inset 0 -1px 0 0 var(--w-white);
 }
-.menu__key { margin-left: auto; padding-left: 22px; opacity: 0.75; }
 
 /* ---------- Toolbar ---------- */
 
@@ -628,7 +594,6 @@ body.hide-dirbar .dirbar { display: none; }
     inset 0  1px 0 0 var(--w-gray),
     inset 0 -1px 0 0 var(--w-white);
 }
-.rule--tight { margin: 14px 0; }
 
 /* ---------- Masthead ---------- */
 

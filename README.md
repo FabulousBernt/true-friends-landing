@@ -46,12 +46,12 @@ VP9 and nothing else, no second `<source>`. A browser that cannot play VP9
 (Safari before 14) gets the poster, which is the intended degradation rather
 than a banded fallback.
 
-Encoded from `tf-landing-monocrome-video.mp4` in the repository root: 80
-seconds, 1920x1080 at 24fps, 57MB, with an AAC track. None of that ships. The
-clip is cut to a 20-second window starting at 0:20 — long enough that the loop
-does not announce itself, short enough that 38dB PSNR fits inside 1.97MB — and
-the shipped file is four ninths of the pixels, five sixths of the frame rate,
-and no audio at all.
+Encoded from a master that is not in this repository: 80 seconds, 1920x1080 at
+24fps, 57MB, with an AAC track — larger than everything else here combined.
+None of that ships. The clip is cut to a 20-second window starting at 0:20 —
+long enough that the loop does not announce itself, short enough that 38dB PSNR
+fits inside 1.97MB — and the shipped file is four ninths of the pixels, five
+sixths of the frame rate, and no audio at all.
 
 1280x720 rather than the 960x540 this started at, because object-fit: cover
 upscales it 2× on a 1080p screen and 3.6× on a 3440px one. On this footage the
@@ -59,7 +59,7 @@ resolution is spent on the thin wisps, which are where the detail is; the soft
 areas compress to nothing either way.
 
 ```sh
-ffmpeg -ss 20 -t 20 -i tf-landing-monocrome-video.mp4 \
+ffmpeg -ss 20 -t 20 -i master.mp4 \
   -filter_complex "
     [0:v]scale=1280:720:flags=lanczos,fps=20,split=3[a][b][c];
     [a]trim=0:1.0,setpts=PTS-STARTPTS[head];
@@ -195,12 +195,6 @@ that would have noticed the September sweep deleting one rule too many.
 The link checker cannot see paths built in JavaScript, and it does not read CSS
 `url()` at all. That is how the 1996 gallery was missed once already, and why
 the CSS-only references are worth an eyeball in the console.
-
-`img/landing-hero-bg.webp` — 403KB — is **no longer referenced by anything.** It
-was the hero still and the `<link rel="preload">` that went with it; the video's
-poster replaced both. It is left in place rather than deleted, because deleting a
-tracked asset is not this repository's decision to make quietly. Delete it when
-you are sure.
 
 ## History
 
