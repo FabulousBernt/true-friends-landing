@@ -145,7 +145,7 @@
   //
   // It is not autoplayed from the markup and it is not preloaded: both are on
   // this side of the decision, so a reader who asked for reduced motion is never
-  // made to download 1.3MB of video in order to be shown the poster that is
+  // made to download 2MB of video in order to be shown the poster that is
   // already sitting there. The poster is the first frame of the loop, so "does
   // not play" and "plays" are the same picture at different times rather than
   // two different pictures.

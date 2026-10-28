@@ -35,23 +35,23 @@
      drawn. Making both of them white would flip that corner from a weight to a
      haze, which is a different picture rather than a desaturated one.
 
-     Alphas are low because this layer sits under a photograph whose speculars
+     Alphas are low because this layer sits under a video whose bright wisps
      are already near white. The measurement in layout.css is a floor taken
-     before the scrim above it darkens further, and it puts .4 at 0.0% of
-     pixels under 4.5:1 against the cream text. Inverted, that is about 7/255
-     between the brightest texture pixel and the 4.5:1 line.
+     before the scrim above it darkens further, and it puts .5 at 0.00% of
+     pixels under 4.5:1 against --color-text, worst pixel 4.51:1 — the line, by
+     a hair.
 
-     The glow does not fit inside that on its own. At 7% white it adds about
-     17/255 at the ground and 10/255 after the photo's opacity .4 carries most
-     of it upward, against 7/255 of headroom — so the worst pixel still sits
-     under 4.5:1 before the scrim, and the scrim above is what brings it back
-     over the line. That makes body.landing .hero__scrim load-bearing for this
-     gradient. Worth knowing before editing either rule.
+     The glow does not fit inside that with any margin. At 7% white it adds
+     about 17/255 at the ground and 10/255 after the photo's opacity .5 carries
+     most of it upward, and the worst pixel lands at 4.51:1 — so this gradient
+     clears the floor on its own, but only just, and the scrim above is what
+     turns that into headroom: 6.51:1 with it. Worth knowing before editing
+     either rule.
 
-     The photograph is greyscale to begin with — widest channel spread across
-     all 2560x1440 of it is 1/255 — so this declaration was the only colour in
-     the hero backdrop. The brand yellow and flame red elsewhere on the page
-     are untouched. */
+     The backdrop video is greyscale — widest channel spread across twelve
+     frames of the decoded loop is 3/255, all of it chroma ringing — so this
+     declaration is still the only colour in the hero backdrop. The brand
+     yellow and flame red elsewhere on the page are untouched. */
   --gradient-hero:
     radial-gradient(ellipse 80% 60% at 70% 65%, rgba(255, 255, 255, 0.07), transparent 70%),
     radial-gradient(ellipse 70% 50% at 20% 30%, rgba(0, 0, 0, 0.85), transparent 70%),

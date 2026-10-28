@@ -31,104 +31,105 @@ tools/check-stubs.sh  verifies every redirect stub
 
 ## The hero backdrop is a video
 
-`img/hero-bg-loop.webm` and `img/hero-bg-poster.webp`. Ten seconds of a blue
-glowing ribbon on near-black, looping, sitting in the layer the chrome still
-photograph used to occupy. The poster is frame 0 of the same file, so the
-no-video fallback is the artwork rather than a different picture.
+`img/hero-bg-loop.webm` (1.97MB, 1280x720, 19 seconds) and
+`img/hero-bg-poster.webp` (73KB). Monochrome smoke drifting through itself,
+looping, sitting in the layer the chrome still photograph used to occupy. The
+poster is frame 0 of the same file, so the no-video fallback is the artwork
+rather than a different picture.
 
-**Not a GIF, and not by preference.** This footage is smooth gradients, and a
-GIF's 256-colour palette with dithering is the worst possible encoder for
-smooth gradients — it bands across exactly the dark-blue falloff the whole image
-is made of, before the file size even comes up. Measured here: an H.264 encode
-at 369KB bands visibly at 4× magnification, and the VP9 at 2.3MB does not.
+**Not a GIF, and not by preference.** This footage is smooth greyscale gradient
+in motion, which is what a 256-colour palette with dithering mangles first: it
+bands the soft passages and dithers the thin wisps, before the file size even
+comes up.
 
 VP9 and nothing else, no second `<source>`. A browser that cannot play VP9
 (Safari before 14) gets the poster, which is the intended degradation rather
 than a banded fallback.
 
-Encoded from `14483720_1920_1080_30fps.mp4`, which is **not in this
-repository** — it is 125MB and it lives wherever the original was downloaded.
-At 1920x1080/30 with a 105 Mbps bitrate it is not a web asset in any form; the
-shipped file is two thirds of the width, two thirds of the frame rate, and a
-fortieth of the bitrate.
+Encoded from `tf-landing-monocrome-video.mp4` in the repository root: 80
+seconds, 1920x1080 at 24fps, 57MB, with an AAC track. None of that ships. The
+clip is cut to a 20-second window starting at 0:20 — long enough that the loop
+does not announce itself, short enough that 38dB PSNR fits inside 1.97MB — and
+the shipped file is four ninths of the pixels, five sixths of the frame rate,
+and no audio at all.
 
 1280x720 rather than the 960x540 this started at, because object-fit: cover
-upscales it 2× on a 1080p screen and 3.6× on a 3440px one, and the
-difference is 1.3MB to 2.3MB. The extra resolution buys nothing visible on the
-smooth gradients — the sparkle texture in the ribbon is the only thing it
-sharpens — but it was asked for and it is not expensive.
+upscales it 2× on a 1080p screen and 3.6× on a 3440px one. On this footage the
+resolution is spent on the thin wisps, which are where the detail is; the soft
+areas compress to nothing either way.
 
 ```sh
-ffmpeg -i 14483720_1920_1080_30fps.mp4 \
-  -vf "scale=1280:720:flags=lanczos,fps=20" -an \
-  -c:v libvpx-vp9 -crf 44 -b:v 1400k -row-mt 1 -cpu-used 4 -deadline good \
+ffmpeg -ss 20 -t 20 -i tf-landing-monocrome-video.mp4 \
+  -filter_complex "
+    [0:v]scale=1280:720:flags=lanczos,fps=20,split=3[a][b][c];
+    [a]trim=0:1.0,setpts=PTS-STARTPTS[head];
+    [b]trim=19.0:20.0,setpts=PTS-STARTPTS[tail];
+    [c]trim=1.0:19.0,setpts=PTS-STARTPTS[mid];
+    [head][tail]blend=all_expr='A*(T/1.0)+B*(1-T/1.0)'[xf];
+    [xf][mid]concat=n=2:v=1:a=0[out]" \
+  -map "[out]" -an \
+  -c:v libvpx-vp9 -crf 46 -b:v 1200k -row-mt 1 -cpu-used 4 -deadline good \
   -pix_fmt yuv420p img/hero-bg-loop.webm
 
 # poster = frame 0 exactly, so there is no jump at the handover
-ffmpeg -i 14483720_1920_1080_30fps.mp4 \
-  -vf "select=eq(n\,0),scale=1280:720:flags=lanczos" -frames:v 1 /tmp/poster.png
+ffmpeg -i img/hero-bg-loop.webm -vf "select=eq(n\,0)" -frames:v 1 /tmp/poster.png
 cwebp -q 72 -m 6 -sharp_yuv /tmp/poster.png -o img/hero-bg-poster.webp
 ```
 
-`-an` because there is no audio track and `muted` is then not a policy but a
-statement of fact — though `muted` still has to be in the markup either way, as
-both iOS and Android refuse to autoplay a video element without it.
+`-an` because the source's audio track is not part of the artwork, and `muted` is
+then a statement of fact rather than a policy — though `muted` still has to be in
+the markup either way, as both iOS and Android refuse to autoplay a video
+element without it.
 
-**The loop is real.** Frame 0 against frame 299, which is what a wrap-around
-costs, is 33.5dB PSNR; two adjacent frames mid-clip are 34.5dB and 35.6dB. So
-the seam is roughly one frame's worth of change and `loop` is invisible.
+**The loop is a dissolve, because the footage does not line up with itself.**
+Two adjacent frames are 38.3dB apart, ten seconds of drift is 16.6dB, and the
+window's first frame against its last is 16.1dB — by twenty seconds the smoke
+has become a different picture, and a hard cut there would read as a jump. So
+the last second is crossfaded into the first, and the join a viewer actually
+reaches is the wrap, which is temporally continuous: 39.5dB, indistinguishable
+from any other frame step.
 
-**Dimmed to the same 0.4 the chrome still used**, on the same reasoning: the
-bright edge swallows body text. The measured table is on the rule in
-`css/layout.css`. Short version — 0.4 is the highest opacity at which nothing in
-the loop falls under 4.5:1 against `--color-text`, and the worst pixel lands at
-4.98:1, the identical figure the chrome reached at the identical value.
+**Dimmed to 0.5**, one step up from the 0.4 the two backdrops before it used,
+because this clip is much darker than either: composited mean luminance 0.0065
+at 0.5, against the ribbon's 0.0078 at 0.4 and the foliage's 0.0154. Carrying
+the same number over would have made it nearly invisible. At 0.5 it clears
+4.5:1 before the scrim (4.51:1, 0.00% under) and comfortably after it (6.51:1,
+0.00% under). The full table is on the rule in `css/layout.css`.
 
 **`autoplay` is not in the markup and `preload="none"` is.** `js/main.js` calls
 `play()` only when the reader has not set `prefers-reduced-motion: reduce`. A
-reader who asked for reduced motion is therefore never made to download 2.3MB in
-order to be shown the 228KB poster that is already there — verified: with
+reader who asked for reduced motion is therefore never made to download 2MB in
+order to be shown the 73KB poster that is already there — verified: with
 reduced motion emulated, the page fetches the poster and no media request is
 made at all. With JavaScript off, the poster is the whole of it.
 
-## The wordmark is chrome, and its dark stop is not black
+## The wordmark is cream, and it has no floor to defend
 
-`.hero__name` is painted with a `background-clip: text` gradient rather than set
-in a colour, so the metal is in the glyphs and the text itself is still real text
-— it is the h1's accessible name, the site's own name, and it has to stay
-selectable and readable by a screen reader.
+`.hero__name` is set in `--color-cream` (#faf9f5), the same cream the lede and
+the buttons wear, and it is a flat fill: no `background-clip: text`, no
+gradient, no `@supports` guard. It wore the chrome gradient — floor `#8b98ab`,
+measured against the backdrop behind it at every point in the loop, plus a
+drop-shadow holding the metal off the moving video — until it was set in the
+lede's cream instead, which took both with it. A flat fill needs neither the
+clip nor the guard that kept the gradient from failing into an invisible h1, and
+the measurement below is why the shadow could go.
 
-It is wrapped in `@supports ((-webkit-background-clip: text) or (background-clip:
-text))` because the failure mode is not a plainer wordmark, it is **no**
-wordmark: `color: transparent` outside a block that `background-clip` actually
-applies is an invisible h1 and an unnameable page. A browser without support
-keeps `--color-text-strong`.
+The measurement: cream at L 0.9467 against the brightest pixel that ever passes
+behind these letters, composited the way the page composites it (twelve frames
+of the loop at 0.5 over the gradient, then the scrim — the same compositing the
+table in `css/layout.css` uses), sampled in the band the name actually occupies:
 
-**The gradient's floor is #8b98ab, which is a measured number and then a
-judgement on top of it.** The usual chrome recipe bottoms out at near-black, and
-near-black is invisible here: the ground is `#0a0a0a` with the video over it.
-Measured by hiding the element and sampling the backdrop behind it at 56 points
-across the loop, the brightest pixel that ever passes behind these letters is
-L 0.0235, at t=5.1s, where the ribbon's edge swings closest. Against that:
+| where the pixels come from | brightest L | cream vs it |
+|---|---|---|
+| the name's own band, y36–46% x25–75% | 0.0555 | 9.44:1 |
+| a wider band, y30–52% x10–90% | 0.0764 | 7.89:1 |
+| the whole frame | 0.0789 | 7.73:1 |
 
-| stop | L | contrast | |
-|---|---|---|---|
-| `#3d4753` | 0.0612 | 1.51:1 | the recipe's floor — fails |
-| `#55606f` | 0.1144 | 2.24:1 | fails |
-| `#6d7b8d` | 0.1934 | 3.31:1 | clears 3:1 — **where it started** |
-| **`#8b98ab`** | **0.3089** | **4.88:1** | **where it is now** |
-
-It sat at `#6d7b8d` first, which was the darkest value clearing 3:1 — the bar for
-large text, and this is 29.6px of type. That met the number and looked like a
-shadow with a chrome gradient laid over it rather than like metal. A tube
-photographed against a dark room does not have a black side: it picks up ambient
-light, and its dark band is a mid grey. `#8b98ab` is that grey, and the whole
-lower half of the ramp came up with it rather than one stop being lifted out of a
-still-heavy gradient.
-
-Note the floor is specific to *this* backdrop at *this* opacity. Darkening the
-video layer or lightening the page ground moves it, and re-measuring is a browser
-run rather than a calculation.
+Body text against that same worst pixel is 6.51:1, so the wordmark sits above
+the body rather than with it, and there is no dark stop to defend. The figure is
+still specific to *this* backdrop at *this* opacity: darkening the video layer
+or lightening the page ground moves it, and re-measuring after either is a
+browser run rather than a calculation.
 
 ## The lockup's three gaps are even
 

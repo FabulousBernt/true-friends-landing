@@ -167,37 +167,36 @@ body.landing > .hero__scrim {
   pointer-events: none;
 }
 
-/* The blue ribbon: a near-black ground with a glowing specular edge, and the
-   reason this layer is dimmed as hard as it is. It cannot run at full strength —
-   the bright edge is bright enough to swallow body text. Measured over twenty
-   frames of the loop, composited over --color-bg and before the scrim above it
-   darkens things further, exactly as the chrome table below was:
+/* The monochrome smoke: black and grey drifting through itself, and the reason
+   this layer is dimmed as hard as it is. It cannot run at full strength — the
+   bright wisps reach L 0.85 on their own, and that is enough to swallow body
+   text. Measured over twelve frames of the loop, composited over --color-bg and
+   before the scrim above it darkens things further:
 
-     opacity  worst cream  pixels under 4.5:1
-       1.00         —             —
-       0.60      2.69:1          3.50%
-       0.50      3.61:1          0.66%
-       0.45      4.23:1          0.01%
-       0.40      4.98:1          0.00%
-       0.35      5.88:1          0.00%
-       0.30      6.97:1          0.00%
+     opacity  worst vs text  pixels under 4.5:1
+       1.00      1.52:1         1.56%
+       0.70      2.79:1         0.17%
+       0.60      3.52:1         0.03%
+       0.50      4.51:1         0.00%
+       0.45      5.12:1         0.00%
+       0.40      5.84:1         0.00%
+       0.35      6.67:1         0.00%
 
-   0.4 is the value this carries and it is the same one the chrome still used, so
-   the two read as one decision rather than two. It is also, independently, the
-   highest value at which nothing at all in the loop falls under 4.5:1 — the
-   worst pixel lands at 4.98:1, the same figure the chrome table reached at the
-   same opacity.
+   0.5 is what this carries, one step up from the 0.4 the two backdrops before
+   it used. That is the footage and not a change of policy: this clip is much
+   darker than either of them — composited mean luminance 0.0065 at 0.5, where
+   the ribbon it replaced measured 0.0078 at 0.4 and the foliage that briefly
+   followed it 0.0154 — so carrying the same number over would have made it
+   nearly invisible. 0.5 buys the presence back and still clears 4.5:1 before
+   the scrim does anything (4.51:1, 0.00% under), and comfortably after it
+   (6.51:1, 0.00% under).
 
-   It reads fainter than the chrome did at the same number, and that is the
-   footage rather than the setting: mean luminance 0.0155 against the chrome's
-   0.0259, so this one sits five times above the ground where that one sat nine.
-   A blue glow on black carries less of its energy in the midtones than white
-   speculars do. 0.45 is the next step up and costs 0.01% of pixels; take it if
-   the backdrop wants more presence.
+   0.6 is the next step and costs 0.03% of pixels before the scrim; the scrim
+   absorbs that too, but there is no reason to spend it.
 
    The 60% fade below still holds the bottom edge down under the email row. */
 body.landing > .hero__photo {
-  opacity: 0.4;
+  opacity: 0.5;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
           mask-image: linear-gradient(180deg, #000 0%, #000 60%, transparent 100%);
 }
@@ -415,8 +414,9 @@ MUST come after .hero__mark img in this file. Both selectors are (0,1,1), so
    to match the smiley's metal. A flat fill needs neither background-clip nor
    the @supports guard that kept the gradient from failing into an invisible
    h1, and the drop-shadow went with the gradient: it was there to hold the
-   metal off the moving video, and cream against a backdrop whose brightest
-   ever pixel is L 0.0235 needs no help. */
+   metal off the moving video, and cream at L 0.9467 against a backdrop whose
+   brightest ever pixel is L 0.0555 needs no help — 9.4:1 in the band the
+   name occupies, 7.7:1 against the worst pixel anywhere in the frame. */
 .hero__name {
   margin: calc(var(--rhythm) * 1.8) 0 0;
   margin-right: -0.5em;

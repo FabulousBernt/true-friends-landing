@@ -27,8 +27,8 @@
          parsed the CSS. The backdrop is a <video> with a poster attribute in the
          body now, so both are discoverable by the parser and neither needs
          telling. Preloading the video instead was considered and rejected: it
-         would fetch 1.3MB for the readers who asked for reduced motion and are
-         only ever going to see the poster. -->
+         would fetch the 2MB loop for the readers who asked for reduced motion
+         and are only ever going to see the poster. -->
     <!-- Blocking on purpose: decides before first paint whether the
          English markup is about to be translated. See the file. -->
     <script src="js/lang-boot.js"></script>
@@ -43,26 +43,26 @@
   </defs>
 </svg>
 <div class="hero__bg" aria-hidden="true"></div>
-<!-- The hero backdrop is a video: a 10-second seamless loop of the blue ribbon,
-     at 960x540 and 1.3MB, sitting in the layer the still photograph used to
-     occupy. Nothing about the layer changed — same z-index, same mask, same
-     dimming — so the only difference on the page is that the pixels move.
+<!-- The hero backdrop is a video: a 19-second loop of monochrome smoke drifting
+     through itself, at 1280x720 and 1.97MB, sitting in the layer the still
+     photograph used to occupy. Nothing about the layer changed — same z-index,
+     same mask, same dimming — so the only difference on the page is that the
+     pixels move.
 
-     VP9 in WebM and nothing else. An H.264 fallback at a size worth shipping
-     (369KB) bands visibly across the smooth dark-blue falloff, which is the one
-     thing this footage is made of, and a browser that cannot play VP9 gets the
-     poster instead — which is frame 0 of this same file, so the fallback is the
-     artwork rather than a different picture.
+     VP9 in WebM and nothing else. This footage is smooth greyscale gradient in
+     motion, which is where a coarser codec bands first, and a browser that
+     cannot play VP9 gets the poster instead — which is frame 0 of this same
+     file, so the fallback is the artwork rather than a different picture.
 
      autoplay is deliberately absent and preload is "none". main.js calls play()
      only when the reader has not asked for reduced motion, so someone who would
-     be shown a still anyway never downloads 1.3MB to be shown that still. With
+     be shown a still anyway never downloads 2MB to be shown that still. With
      JavaScript off the poster is the whole of it, which is a finished page and
      not a broken one.
 
      muted and playsinline are both required for autoplay to be permitted at all
      on iOS and on Android; neither is about this video, which has no audio
-     track to begin with (the encode is -an).
+     track to begin with (the source has one, but the encode is -an).
 
      aria-hidden because it is decoration: there is nothing in it a screen
      reader could be told that the page does not already say in text. -->
